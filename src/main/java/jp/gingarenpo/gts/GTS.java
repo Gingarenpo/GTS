@@ -1,6 +1,8 @@
 package jp.gingarenpo.gts;
 
+import jp.gingarenpo.gts.pack.Loader;
 import net.minecraft.block.Block;
+import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -9,6 +11,10 @@ import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 /**
  * Minecraft 1.12.2の世界に、交通システムの概念を追加する総合Mod。
@@ -39,6 +45,21 @@ public class GTS {
 	public static final String VERSION = "2.0";
 
 	/**
+	 * GTSのロガー。
+	 */
+	public static final Logger LOGGER = LogManager.getLogger("GTS");
+
+	/**
+	 * GTSのアドオンを読みだすためのローダー。
+	 */
+	public static final Loader LOADER = new Loader();
+
+	/**
+	 * GTSのアドオンを格納しているディレクトリの位置。
+	 */
+	public static File GTS_MOD_DIR;
+
+	/**
 	 * Forgeによって作製される、自分自身のインスタンス。ここがNULLになることはない。
 	 * This is the instance of your mod as created by Forge. It will never be null.
 	 */
@@ -52,7 +73,9 @@ public class GTS {
 	 */
 	@Mod.EventHandler
 	public void preinit(FMLPreInitializationEvent event) {
-
+		// アドオンの読み込みを開始する
+		GTS_MOD_DIR = new File(Minecraft.getMinecraft().gameDir.getAbsolutePath() + "\\mods\\GTS"); // 場所を指定
+		LOADER.search(GTS_MOD_DIR); // 検索を開始
 	}
 
 	/**
