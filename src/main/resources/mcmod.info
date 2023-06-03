@@ -1,0 +1,18 @@
+[
+  {
+    "modid": "gts",
+    "name": "GTS - Ginren Traffic System Mod",
+    "description": "",
+    "version": "${version}",
+    "mcversion": "${mcversion}",
+    "url": "https://ginren.info/GFactory",
+    "updateUrl": "",
+    "authorList": [
+      "Gingarenpo"
+    ],
+    "credits": "",
+    "logoFile": "",
+    "screenshots": [],
+    "dependencies": []
+  }
+]
