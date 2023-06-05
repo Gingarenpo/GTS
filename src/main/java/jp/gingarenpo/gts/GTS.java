@@ -1,9 +1,11 @@
 package jp.gingarenpo.gts;
 
+import jp.gingarenpo.gts.base.GTSTileEntity;
 import jp.gingarenpo.gts.pack.Loader;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.item.Item;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
@@ -37,7 +39,7 @@ public class GTS {
 	/**
 	 * Mod自体の名前。一覧に表示されるときのもの。
 	 */
-	public static final String MOD_NAME = "GTS";
+	public static final String MOD_NAME = "GTS - Ginren Traffic System";
 
 	/**
 	 * Modのバージョン。
@@ -76,6 +78,9 @@ public class GTS {
 		// アドオンの読み込みを開始する
 		GTS_MOD_DIR = new File(Minecraft.getMinecraft().gameDir.getAbsolutePath() + "\\mods\\GTS"); // 場所を指定
 		LOADER.search(GTS_MOD_DIR); // 検索を開始
+
+		// TileEntityを登録する
+		GameRegistry.registerTileEntity(GTSTileEntity.class, new ResourceLocation(MOD_ID, ""));
 	}
 
 	/**
