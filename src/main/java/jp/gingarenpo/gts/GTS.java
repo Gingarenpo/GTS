@@ -1,17 +1,27 @@
 package jp.gingarenpo.gts;
 
-import jp.gingarenpo.gts.base.GTSTileEntity;
+import jp.gingarenpo.gts.base.GTSGuiHandler;
+import jp.gingarenpo.gts.control.BlockTrafficController;
+import jp.gingarenpo.gts.control.TileEntityTrafficController;
 import jp.gingarenpo.gts.pack.Loader;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
+import net.minecraft.item.ItemBlock;
+import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.client.event.ModelRegistryEvent;
+import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
+import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -62,6 +72,16 @@ public class GTS {
 	public static File GTS_MOD_DIR;
 
 	/**
+	 * GTSのブロックやアイテムを格納するためのタブ。
+	 */
+	public static CreativeTabs TAB;
+
+	/**
+	 * パケット通信に使用する簡易的なネットワークアダプタみたいなもの。
+	 */
+	public static SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(MOD_ID);
+
+	/**
 	 * Forgeによって作製される、自分自身のインスタンス。ここがNULLになることはない。
 	 * This is the instance of your mod as created by Forge. It will never be null.
 	 */
@@ -80,7 +100,10 @@ public class GTS {
 		LOADER.search(GTS_MOD_DIR); // 検索を開始
 
 		// TileEntityを登録する
-		GameRegistry.registerTileEntity(GTSTileEntity.class, new ResourceLocation(MOD_ID, ""));
+		GameRegistry.registerTileEntity(TileEntityTrafficController.class, new ResourceLocation(MOD_ID, "traffic_controller"));
+
+		// GUIハンドラの登録
+		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GTSGuiHandler());
 	}
 
 	/**
@@ -89,7 +112,13 @@ public class GTS {
 	 */
 	@Mod.EventHandler
 	public void init(FMLInitializationEvent event) {
-
+		// タブを登録する
+		TAB = new CreativeTabs("gts_tab") {
+			@Override
+			public ItemStack createIcon() {
+				return new ItemStack(Items.traffic_controller);
+			}
+		};
 	}
 
 	/**
@@ -103,15 +132,15 @@ public class GTS {
 
 	/**
 	 * Forgeはここに記されているブロックを読み込んで登録することができる。
+	 * ブロック登録イベントが発火されたとき、大文字を小文字にしたうえで同名のフィールドを探してそこにインスタンスを入れてくれるようだ。
+	 * 一致しないと「Unable to lookup」が出る
 	 *
 	 * Forge will automatically look up and bind blocks to the fields in this class
 	 * based on their registry name.
 	 */
 	@GameRegistry.ObjectHolder(MOD_ID)
 	public static class Blocks {
-      /*
-          public static final MySpecialBlock mySpecialBlock = null; // placeholder for special block below
-      */
+      public static final BlockTrafficController traffic_controller = null;
 	}
 
 	/**
@@ -121,10 +150,7 @@ public class GTS {
 	 */
 	@GameRegistry.ObjectHolder(MOD_ID)
 	public static class Items {
-      /*
-          public static final ItemBlock mySpecialBlock = null; // itemblock for the block above
-          public static final MySpecialItem mySpecialItem = null; // placeholder for special item below
-      */
+      public static final ItemBlock traffic_controller = null;
 	}
 
 	/**
@@ -138,10 +164,11 @@ public class GTS {
 		 */
 		@SubscribeEvent
 		public static void addItems(RegistryEvent.Register<Item> event) {
-           /*
-             event.getRegistry().register(new ItemBlock(Blocks.myBlock).setRegistryName(MOD_ID, "myBlock"));
-             event.getRegistry().register(new MySpecialItem().setRegistryName(MOD_ID, "mySpecialItem"));
-            */
+			System.out.println("ADD ITEM!");
+			event.getRegistry().registerAll(
+					// 制御機ブロック（アイテム）を追加
+					new ItemBlock(Blocks.traffic_controller).setRegistryName(MOD_ID, "traffic_controller")
+			);
 		}
 
 		/**
@@ -149,9 +176,20 @@ public class GTS {
 		 */
 		@SubscribeEvent
 		public static void addBlocks(RegistryEvent.Register<Block> event) {
-           /*
-             event.getRegistry().register(new MySpecialBlock().setRegistryName(MOD_ID, "mySpecialBlock"));
-            */
+			System.out.println("ADD BLOCK!");
+			event.getRegistry().registerAll(
+					// 制御機ブロックを追加
+					new BlockTrafficController().setRegistryName(MOD_ID, "traffic_controller")
+			);
+		}
+
+		/**
+		 * モデルを登録するイベント（クライアントサイドのみで発火する）。
+		 * これを行わないとJSONを読み込んでくれない？（FileNotFoundExceptionが出る）
+		 */
+		@SubscribeEvent
+		public static void registerModels(ModelRegistryEvent event) {
+			ModelLoader.setCustomModelResourceLocation(Items.traffic_controller, 0, new ModelResourceLocation(Items.traffic_controller.getRegistryName(), "inventory"));
 		}
 	}
 

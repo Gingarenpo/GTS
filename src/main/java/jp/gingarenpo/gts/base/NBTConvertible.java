@@ -21,9 +21,8 @@ public interface NBTConvertible<T extends NBTConvertible<T>> {
 	 * シリアライズ時のデータを復元する際に使用する。
 	 *
 	 * @param compound タグ。
-	 * @return タグの内容をもとに復元したインスタンス。
 	 */
-	public T readFromNBT(NBTTagCompound compound);
+	public void readFromNBT(NBTTagCompound compound);
 
 
 	/**

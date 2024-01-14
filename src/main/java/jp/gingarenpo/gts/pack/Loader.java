@@ -190,7 +190,7 @@ public class Loader {
 		} catch (IOException e) {
 			GTS.LOGGER.warn("["+pack.getName()+"] entry \""+entry.getName()+"\" is not a MQO model. -> " + e.getMessage());
 		}
-		GTS.LOGGER.info("["+pack.getName()+"] entry \""+entry.getName()+"\" loaded.");
+		GTS.LOGGER.info("["+pack.getName()+"] entry \""+entry.getName()+"\" loaded. (mqo)");
 	}
 
 	/**
@@ -212,7 +212,7 @@ public class Loader {
 		} catch (IOException e) {
 			GTS.LOGGER.warn("["+pack.getName()+"] entry \""+entry.getName()+"\" is invalid texture file. -> " + e.getMessage());
 		}
-		GTS.LOGGER.info("["+pack.getName()+"] entry \""+entry.getName()+"\" loaded.");
+		GTS.LOGGER.info("["+pack.getName()+"] entry \""+entry.getName()+"\" loaded. (Texture)");
 	}
 
 	/**
@@ -228,7 +228,7 @@ public class Loader {
 		byte[] data = this.readData(pack, entry, zis);
 		if (data == null) return; // 読み込みに失敗した場合
 		pack.getSounds().put(entry.getName(), data);
-		GTS.LOGGER.info("["+pack.getName()+"] entry \""+entry.getName()+"\" loaded.");
+		GTS.LOGGER.info("["+pack.getName()+"] entry \""+entry.getName()+"\" loaded. (ogg)");
 	}
 
 	/**

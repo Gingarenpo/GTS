@@ -93,7 +93,7 @@ public abstract class GTSTileEntity<T extends NBTConvertible<T>> extends TileEnt
 		if (compound.hasKey(NBT_KEY)) {
 			if (this.data != null) {
 				// データの種類自体は変更されないので、Tが既に存在する場合は最新の状態を反映する
-				this.data = this.data.readFromNBT(compound.getCompoundTag(NBT_KEY));
+				this.data.readFromNBT(compound.getCompoundTag(NBT_KEY));
 			}
 			else {
 				// NULLの場合、タグをもとにしてデータを作成する
