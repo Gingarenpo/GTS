@@ -2,11 +2,13 @@ package jp.gingarenpo.gts;
 
 import jp.gingarenpo.gts.base.GTSGuiHandler;
 import jp.gingarenpo.gts.control.BlockTrafficController;
+import jp.gingarenpo.gts.control.RendererTrafficController;
 import jp.gingarenpo.gts.control.TileEntityTrafficController;
 import jp.gingarenpo.gts.pack.Loader;
 import net.minecraft.block.Block;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.block.model.ModelResourceLocation;
+import net.minecraft.client.resources.FileResourcePack;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemBlock;
@@ -15,6 +17,7 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.client.event.ModelRegistryEvent;
 import net.minecraftforge.client.model.ModelLoader;
 import net.minecraftforge.event.RegistryEvent;
+import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
@@ -23,10 +26,15 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import net.minecraftforge.fml.common.registry.GameRegistry;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+import java.io.BufferedInputStream;
 import java.io.File;
+import java.io.InputStream;
+import java.util.Scanner;
 
 /**
  * Minecraft 1.12.2の世界に、交通システムの概念を追加する総合Mod。
@@ -89,6 +97,11 @@ public class GTS {
 	public static GTS INSTANCE;
 
 	/**
+	 * ダミーパックの名称。
+	 */
+	public static final String DUMMY_PACK_NAME = "___Dummy___";
+
+	/**
 	 * 初期化フェーズ。TileEntityなどの登録は基本的にここで行う。
 	 * This is the first initialization event. Register tile entities here.
 	 * The registry events below will have fired prior to entry to this method.
@@ -104,6 +117,11 @@ public class GTS {
 
 		// GUIハンドラの登録
 		NetworkRegistry.INSTANCE.registerGuiHandler(this, new GTSGuiHandler());
+
+		// TESRの登録
+		this.registerTESRs();
+
+
 	}
 
 	/**
@@ -189,8 +207,18 @@ public class GTS {
 		 */
 		@SubscribeEvent
 		public static void registerModels(ModelRegistryEvent event) {
-			ModelLoader.setCustomModelResourceLocation(Items.traffic_controller, 0, new ModelResourceLocation(Items.traffic_controller.getRegistryName(), "inventory"));
+			ModelLoader.setCustomModelResourceLocation(Items.traffic_controller, 0, new net.minecraft.client.renderer.block.model.ModelResourceLocation(Items.traffic_controller.getRegistryName(), "inventory"));
 		}
+	}
+
+	/**
+	 * TileEntitySpecialRendererを登録するメソッド
+	 * これは、クライアントサイドからしか呼んではならないため別メソッド化。
+	 */
+	@SideOnly(Side.CLIENT)
+	public void registerTESRs() {
+		// 制御機のレンダー
+		ClientRegistry.bindTileEntitySpecialRenderer(TileEntityTrafficController.class, new RendererTrafficController());
 	}
 
 }

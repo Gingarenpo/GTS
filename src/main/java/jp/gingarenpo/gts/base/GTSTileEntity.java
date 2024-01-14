@@ -14,7 +14,7 @@ import javax.annotation.Nullable;
  * Configを別途持たせる形で保持するため、このTでは固有のデータを参照する場合に
  * 使用されたい。
  */
-public abstract class GTSTileEntity<T extends NBTConvertible<T>> extends TileEntity {
+public abstract class GTSTileEntity<T extends NBTConvertible<T>, U extends ConfigBase> extends TileEntity {
 
 	/**
 	 * このTileEntityのデータをNBTタグに格納する際のキー。
@@ -27,6 +27,13 @@ public abstract class GTSTileEntity<T extends NBTConvertible<T>> extends TileEnt
 	 * クラスであり、データの差し替えに関しては考慮しない。
 	 */
 	protected T data;
+
+	/**
+	 * このTileEntityの外観を決めるコンフィグデータの実体。
+	 * 実体と言ってもこの中にリソースバイナリが入っているわけではなく、
+	 * ようはConfigのインスタンスの使いまわし。
+	 */
+	protected U config;
 
 	/**
 	 * データが何も存在しない空のTileEntityを作成する場合に使用する。
@@ -79,6 +86,22 @@ public abstract class GTSTileEntity<T extends NBTConvertible<T>> extends TileEnt
 	 */
 	public boolean empty() {
 		return this.data == null;
+	}
+
+	/**
+	 * このTileEntityのコンフィグを取得する。
+	 * @return コンフィグ
+	 */
+	public U getConfig() {
+		return config;
+	}
+
+	/**
+	 * このTileEntityのコンフィグを登録する。
+	 * @param config 登録したいコンフィグ。
+	 */
+	public void setConfig(U config) {
+		this.config = config;
 	}
 
 	/**

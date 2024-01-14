@@ -7,7 +7,7 @@ import net.minecraft.nbt.NBTTagCompound;
  * 交通信号制御機に関するTileEntity。制御機のあるところにその制御機の
  * データを保管しておく。特にそれ以外追加するものは存在しない。
  */
-public class TileEntityTrafficController extends GTSTileEntity<DataTrafficController> {
+public class TileEntityTrafficController extends GTSTileEntity<DataTrafficController, ConfigTrafficController> {
 
 	/**
 	 * タグをもとにしてデータのインスタンスを返却する。

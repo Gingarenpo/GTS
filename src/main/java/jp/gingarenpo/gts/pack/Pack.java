@@ -2,6 +2,9 @@ package jp.gingarenpo.gts.pack;
 
 import jp.gingarenpo.gingacore.mqo.MQO;
 import jp.gingarenpo.gts.base.ConfigBase;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.util.ResourceLocation;
 
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -37,6 +40,15 @@ public class Pack {
 	 * Renderに渡すときにはこの中身を保持する。
 	 */
 	private HashMap<String, BufferedImage> textures = new HashMap<>();
+
+	/**
+	 * レンダリングの際に使用する、DynamicTextureのリソースロケーションを集めたもの。
+	 * テクスチャを動的に生成して貼り付ける作業は負荷が重く、モデルごとにすべてやると
+	 * メモリ使用量が半端ないため、使用する時に1回生成し、それを使いまわせるようにする。
+	 * キーはConfigとなる。同じインスタンスが
+	 * 入るはず。
+	 */
+	HashMap<String, ResourceLocation> bindTextures = new HashMap<>();
 
 	private HashMap<String, ConfigBase> configs = new HashMap<>();
 
@@ -74,6 +86,15 @@ public class Pack {
 	 */
 	public Pack(File file) {
 		this("unknown", file);
+	}
+
+	/**
+	 * 指定された名前のパックを作成する。
+	 * このコンストラクタはダミーパックを作成するために使用するものであり、
+	 * 通常使用するべきではない。
+	 */
+	public Pack(String name) {
+		this.name = name;
 	}
 
 	/**
@@ -196,5 +217,17 @@ public class Pack {
 	 */
 	public void setConfigs(HashMap<String, ConfigBase> configs) {
 		this.configs = configs;
+	}
+
+	public ResourceLocation getOrCreateBindTexture(String name) {
+		ResourceLocation r = this.bindTextures.get(name);
+		BufferedImage b = this.textures.get(name);
+		if (r != null) return r;
+
+		// 指定された中身でDynamicTextureを作成するが
+		if (b == null) {
+			return null; // テクスチャが見当たらない
+		}
+		return Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(name, new DynamicTexture(b));
 	}
 }

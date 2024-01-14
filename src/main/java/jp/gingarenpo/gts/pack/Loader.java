@@ -3,18 +3,15 @@ package jp.gingarenpo.gts.pack;
 import com.google.gson.Gson;
 import jp.gingarenpo.gingacore.mqo.MQO;
 import jp.gingarenpo.gts.GTS;
+import jp.gingarenpo.gts.base.ConfigBase;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.ProgressManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
@@ -36,9 +33,58 @@ public class Loader {
 
 	/**
 	 * ローダーインスタンスを初期化する。
+	 * この時、ダミーのパックが1つ追加される（これは必ず成功するようにしてある）
 	 */
 	public Loader() {
-		// NO CODE
+		// ダミーのパックを作成する
+		Pack pack = new Pack(GTS.DUMMY_PACK_NAME);
+		// ダミーのパックにダミーモデルを追加する（ダミーモデルはregistry_nameと同じ名前でいる）
+		HashMap<String, MQO> models = new HashMap<String, MQO>();
+		// なぜかディレクトリをStreamで読み込むとファイル一覧が改行された文字列で返るのでそれを利用する
+		try (InputStream files = ClassLoader.getSystemResourceAsStream("assets/gts/models/dummy/")) {
+			if (files == null) {
+				// 通常あり得ないがダミーモデルのディレクトリが存在しない場合
+				throw new RuntimeException("Dummy Model is missing! Isn't  mod file broken?");
+			}
+			try (Scanner s = new Scanner(files)) {
+				while (s.hasNext()) {
+					// 指定したファイルを読み込んで、モデルを読み込んでいく
+					String name = s.next();
+					try (InputStream model = ClassLoader.getSystemResourceAsStream("assets/gts/models/dummy/" + name)) {
+						if (model == null) {
+							// これも通常あり得ないがもしモデルが実体として存在しない場合
+							continue; // 無視
+						}
+						try {
+							MQO m = new MQO(model); // この時点で失敗したらもう例外
+							models.put(name, m);
+						} catch (IOException e) {
+							GTS.LOGGER.warn("MQO " + name + " is not loading because -> " + e.getMessage());
+							continue;
+						}
+					}
+				}
+			}
+		}
+		catch (IOException e) {
+			throw new RuntimeException("Cannot create Dummy Pack!");
+		}
+		// ダミーパックにmqoを追加する
+		pack.setModels(models);
+
+		// デフォルトテクスチャとしてbase.pngだけ読み込んでおく
+		HashMap<String, BufferedImage> texs = new HashMap<>();
+		try {
+			texs.put("base.png", ImageIO.read(ClassLoader.getSystemResourceAsStream("assets/gts/textures/base/base.png")));
+		} catch (IOException e) {
+			// ミッシングアイコン覚悟
+			e.printStackTrace();
+		}
+		// ダミーパックにテクスチャを追加する
+		pack.setTextures(texs);
+
+		// このパックをダミーとして追加する
+		this.packs.add(pack);
 	}
 
 	/**

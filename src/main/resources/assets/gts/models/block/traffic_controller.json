@@ -2,7 +2,7 @@
 	"credit": "G-Factory",
 	"texture_size": [64, 64],
 	"textures": {
-		"base": "blocks/base_black"
+		"base": "gts:blocks/base_black"
 	},
 	"elements": [
 		{

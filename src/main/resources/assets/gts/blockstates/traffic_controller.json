@@ -1,7 +1,13 @@
 {
+  "forge_marker": 1,
+  "defaults": {
+    "textures": {
+      "base": "gts:blocks/base_black"
+    },
+    "model": "gts:traffic_controller",
+    "uvlock": true
+  },
   "variants": {
-    "normal": {
-      "model": "gts:traffic_controller"
-    }
+    "normal": [{}]
   }
 }
