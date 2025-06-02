@@ -44,7 +44,9 @@ jar {
                 "Implementation-Title": project.name,
                 "Implementation-Version": version,
                 "Implementation-Vendor" :"g-factory",
-                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                // ダブルクリック実行時はAddonMakerを起動する
+                "Main-Class": "com.gfactory.gts.tool.GTSAddonMaker",
         ])
     }
 }
@@ -77,11 +79,24 @@ uploadArchives {
     }
 }
 
+/*
+	MQOクラスのテストクラスを起動させるためのもの
+*/
 tasks.register('runTmp', JavaExec) {
     group = "application"
     description = "Run test class for mqo"
     main = "com.gfactory.core.mqo.Tmp"
     classpath = sourceSets.main.output + configurations.runtimeClasspath
+}
+
+/*
+	開発環境において、アドオンを作成する系のプログラムを起動するためのもの
+*/
+tasks.register("runAddonMaker", JavaExec) {
+	group = "application"
+	description = "Run addon maker"
+	main = "com.gfactory.gts.tool.GTSAddonMaker"
+	classpath = sourceSets.main.output + configurations.runtimeClasspath
 }
 
 
