@@ -48,6 +48,19 @@ public class GTSBlockTrafficPole extends GTSBlock<GTSTileEntityTrafficPole> {
         worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 15);
     }
 
+    /**
+     * 元々ここにアームがクリックされた時を入れようとしていたが、アームに責務を持たせるようにしたためから実装
+     * @param worldIn
+     * @param pos
+     * @param state
+     * @param playerIn
+     * @param hand
+     * @param facing
+     * @param hitX
+     * @param hitY
+     * @param hitZ
+     * @return
+     */
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         return super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ);
@@ -74,4 +87,5 @@ public class GTSBlockTrafficPole extends GTSBlock<GTSTileEntityTrafficPole> {
         self.markDirty();
         worldIn.notifyBlockUpdate(pos, worldIn.getBlockState(pos), worldIn.getBlockState(pos), 15);
     }
+
 }

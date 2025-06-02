@@ -5,13 +5,15 @@ import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSTrafficArmConfig;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
+import net.minecraft.util.math.BlockPos;
 
 /**
  * アームのTileEntity。ただし、pos等を用いるものは使えない。
  */
 public class GTSTileEntityTrafficArm extends GTSTileEntityDummy<GTSTrafficArmConfig> {
 
-    public GTSTileEntityTrafficArm() {
+    public GTSTileEntityTrafficArm(BlockPos pos) {
+        super(pos);
         this.setDummy();
     }
 

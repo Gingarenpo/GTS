@@ -2,7 +2,6 @@ package com.gfactory.gts.minecraft.tileentity;
 
 import com.gfactory.gts.pack.config.GTSConfig;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 
 /**
  * TileEntityを使用しなくてはならないものの、Itemに付与するなどの理由で
@@ -13,35 +12,7 @@ import net.minecraft.world.World;
  */
 public abstract class GTSTileEntityDummy<T extends GTSConfig> extends GTSTileEntity<GTSConfig> {
 
-    /**
-     * このTileEntityは実体を持たないため、posはNULLを返す。
-     * @return 必ずNULL
-     */
-    @Override
-    public BlockPos getPos() {
-        return null;
-    }
-
-    /**
-     * セットしても何も起きない
-     * @param posIn
-     */
-    @Override
-    public void setPos(BlockPos posIn) {
-        // NOOP
-    }
-
-    /**
-     * 世界を持たないためNULLを返す
-     * @return
-     */
-    @Override
-    public World getWorld() {
-        return super.getWorld();
-    }
-
-    @Override
-    public void setWorld(World worldIn) {
-        // NOOP
+    public GTSTileEntityDummy(BlockPos pos) {
+        this.pos = pos;
     }
 }

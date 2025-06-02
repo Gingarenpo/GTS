@@ -111,6 +111,11 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
         if (!(this instanceof GTSTileEntityDummy)) {
             result = super.writeToNBT(compound);
         }
+        else if (this.pos != null) {
+            result.setInteger("x", this.pos.getX());
+            result.setInteger("y", this.pos.getY());
+            result.setInteger("z", this.pos.getZ());
+        }
         result.setString("gts_pack_name", this.pack.getName());
         result.setString("gts_pack_config", this.config.getId());
         result.setDouble("gts_angle", this.angle);
@@ -230,5 +235,15 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
 
     public void setPosZ(double posZ) {
         this.posZ = posZ;
+    }
+
+    /**
+     * 座標が一致していれば、それは等しいとみなす
+     * @param obj
+     * @return
+     */
+    @Override
+    public boolean equals(Object obj) {
+        return (obj instanceof GTSTileEntity && this.pos != null && this.pos.equals(((GTSTileEntity) obj).pos));
     }
 }
