@@ -97,12 +97,16 @@ tasks.register("runPackMaker", JavaExec) {
 	description = "Run pack maker"
 	main = "com.gfactory.gts.tool.GTSPackMaker"
 	classpath = sourceSets.main.output + configurations.runtimeClasspath
-	
-	doFirst {
-        // 不要なタスクが走らないようにする
-        tasks.withType(JavaCompile).configureEach { it.enabled = false }
-        tasks.withType(ProcessResources).configureEach { it.enabled = false }
-    }
+}
+
+/*
+	開発環境において、地名板の生成テストを行うもの
+*/
+tasks.register("runSignGenerator", JavaExec) {
+    group = "application"
+    description = "Run pack maker"
+    main = "com.gfactory.gts.common.GTSSignTextureManager"
+    classpath = sourceSets.main.output + configurations.runtimeClasspath + project.tasks.named("runClient").get().classpath
 }
 
 

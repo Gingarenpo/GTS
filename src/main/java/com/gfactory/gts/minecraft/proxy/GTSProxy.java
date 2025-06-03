@@ -7,6 +7,7 @@ import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficPole;
+import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficSign;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -30,6 +31,7 @@ public class GTSProxy {
         GameRegistry.registerTileEntity(GTSTileEntityTrafficLight.class, new ResourceLocation(GTS.MODID, "traffic_light"));
         GameRegistry.registerTileEntity(GTSTileEntityTrafficController.class, new ResourceLocation(GTS.MODID, "traffic_controller"));
         GameRegistry.registerTileEntity(GTSTileEntityTrafficPole.class, new ResourceLocation(GTS.MODID, "traffic_pole"));
+        GameRegistry.registerTileEntity(GTSTileEntityTrafficSign.class, new ResourceLocation(GTS.MODID, "traffic_sign"));
 
         // Capabilityの登録
         GTSCapabilities.register();

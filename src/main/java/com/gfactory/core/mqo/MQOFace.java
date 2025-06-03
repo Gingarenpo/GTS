@@ -37,7 +37,7 @@ public final class MQOFace {
      * @param vertexId この面を構成するvertexId
      * @param vLength 頂点数
      */
-    MQOFace(int materialId, double[][] uv, int[] vertexId, int vLength) {
+    public MQOFace(int materialId, double[][] uv, int[] vertexId, int vLength) {
         this.materialId = materialId;
         this.uv = uv;
         this.vertexId = vertexId;

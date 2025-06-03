@@ -112,6 +112,11 @@ public class GTSPack {
     private static GTSPack dummyPack;
 
     /**
+     * 完全にモデルを使用しないものでダミーモデル（小さな立方体）
+     */
+    public static final String DUMMY = "dummy";
+
+    /**
      * ダミーモデルの定数（交通信号機モデル）
      */
     public static final String DUMMY_TRAFFIC_LIGHT = "traffic_light";
@@ -278,6 +283,7 @@ public class GTSPack {
 
         // モデルを追加（ここ落ちるかもしれないけど）
         try {
+            pack.models.put(GTSPack.DUMMY, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/dummy.mqo")));
             pack.models.put(GTSPack.DUMMY_TRAFFIC_LIGHT, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficlight.mqo")));
             pack.models.put(GTSPack.DUMMY_TRAFFIC_CONTROLLER, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficcontroller.mqo")));
             pack.models.put(GTSPack.DUMMY_TRAFFIC_POLE, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficpole.mqo")));
@@ -288,6 +294,13 @@ public class GTSPack {
         }
 
         // テクスチャを追加（ここも）
+        try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/dummy/dummy.png")) {
+            if (is == null) throw new IOException();
+            pack.textures.put(GTSPack.DUMMY, ImageIO.read(is));
+        } catch (IOException e) {
+            // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
+            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+        }
         try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/dummy/trafficlight.png")) {
             if (is == null) throw new IOException();
             pack.textures.put(GTSPack.DUMMY_TRAFFIC_LIGHT, ImageIO.read(is));

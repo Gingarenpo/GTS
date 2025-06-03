@@ -37,6 +37,12 @@ public class GTSBlocks {
     public static final Item ITEM_TRAFFIC_POLE = new ItemBlock(TRAFFIC_POLE).setRegistryName(TRAFFIC_POLE.getRegistryName());
 
     /**
+     * 地名板・標示板等
+     */
+    public static final GTSBlockTrafficSign TRAFFIC_SIGN = new GTSBlockTrafficSign();
+    public static final Item ITEM_TRAFFIC_SIGN = new ItemBlock(TRAFFIC_SIGN).setRegistryName(TRAFFIC_SIGN.getRegistryName());
+
+    /**
      * ブロックをレジストリに追加する。これを行わないとMinecraft内でブロックを扱えない。
      * これで登録することでブロックIDが割り当てられる。
      * @param event イベント
@@ -46,6 +52,7 @@ public class GTSBlocks {
         event.getRegistry().register(TRAFFIC_LIGHT);
         event.getRegistry().register(TRAFFIC_CONTROLLER);
         event.getRegistry().register(TRAFFIC_POLE);
+        event.getRegistry().register(TRAFFIC_SIGN);
     }
 
     /**
@@ -58,6 +65,7 @@ public class GTSBlocks {
         event.getRegistry().register(ITEM_TRAFFIC_LIGHT);
         event.getRegistry().register(ITEM_TRAFFIC_CONTROLLER);
         event.getRegistry().register(ITEM_TRAFFIC_POLE);
+        event.getRegistry().register(ITEM_TRAFFIC_SIGN);
 
     }
 
@@ -82,6 +90,11 @@ public class GTSBlocks {
                 GTSBlocks.ITEM_TRAFFIC_POLE,
                 0,
                 new ModelResourceLocation(new ResourceLocation(GTS.MODID, "traffic_pole"), "inventory")
+        );
+        ModelLoader.setCustomModelResourceLocation(
+                GTSBlocks.ITEM_TRAFFIC_SIGN,
+                0,
+                new ModelResourceLocation(new ResourceLocation(GTS.MODID, "traffic_sign"), "inventory")
         );
     }
 }

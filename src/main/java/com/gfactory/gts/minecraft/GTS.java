@@ -69,8 +69,6 @@ public class GTS {
      */
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(GTS.MODID);
 
-
-
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) throws InterruptedException {
         proxy.preInit(event);

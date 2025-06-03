@@ -1,12 +1,11 @@
 package com.gfactory.gts.tool.event;
 
-import java.io.File;
-
-import javax.swing.JFileChooser;
-
 import com.gfactory.gts.tool.GTSPackMaker;
 import com.gfactory.gts.tool.helper.I18n;
 import com.gfactory.gts.tool.project.GTSPackProject;
+
+import javax.swing.*;
+import java.io.File;
 
 /**
  * プロジェクトオープン、作成、セーブ、その他もろもろの操作をメソッドとして格納したもの

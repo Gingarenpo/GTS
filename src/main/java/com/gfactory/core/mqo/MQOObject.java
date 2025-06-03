@@ -51,7 +51,7 @@ public final class MQOObject {
      * 指定した名前のMQOObjectを格納する。
      * @param name オブジェクト名
      */
-    MQOObject(String name) {
+    public MQOObject(String name) {
         this.name = name;
     }
 
@@ -157,7 +157,7 @@ public final class MQOObject {
     /**
      * 法線が不安定なのでしばらくは固定値で呼び出す
      */
-    private void buildVBO() {
+    public void buildVBO() {
         this.buildVBO(true);
     }
 

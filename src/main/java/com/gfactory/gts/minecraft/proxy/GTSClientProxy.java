@@ -5,9 +5,11 @@ import com.gfactory.gts.minecraft.block.GTSBlocks;
 import com.gfactory.gts.minecraft.renderer.GTSTileEntityTrafficControllerRenderer;
 import com.gfactory.gts.minecraft.renderer.GTSTileEntityTrafficLightRenderer;
 import com.gfactory.gts.minecraft.renderer.GTSTileEntityTrafficPoleRenderer;
+import com.gfactory.gts.minecraft.renderer.GTSTileEntityTrafficSignRenderer;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficPole;
+import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficSign;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -43,6 +45,7 @@ public class GTSClientProxy extends GTSProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficLight.class, new GTSTileEntityTrafficLightRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficController.class, new GTSTileEntityTrafficControllerRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficPole.class, new GTSTileEntityTrafficPoleRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficSign.class, new GTSTileEntityTrafficSignRenderer());
     }
 
     @Override

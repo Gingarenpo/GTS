@@ -28,7 +28,7 @@ public final class MQOVertex {
      * @param y Y軸
      * @param z Z軸
      */
-    MQOVertex(double x, double y, double z) {
+    public MQOVertex(double x, double y, double z) {
         this.x = x;
         this.y = y;
         this.z = z;
