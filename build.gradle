@@ -92,11 +92,17 @@ tasks.register('runTmp', JavaExec) {
 /*
 	開発環境において、アドオンを作成する系のプログラムを起動するためのもの
 */
-tasks.register("runAddonMaker", JavaExec) {
+tasks.register("runPackMaker", JavaExec) {
 	group = "application"
-	description = "Run addon maker"
-	main = "com.gfactory.gts.tool.GTSAddonMaker"
+	description = "Run pack maker"
+	main = "com.gfactory.gts.tool.GTSPackMaker"
 	classpath = sourceSets.main.output + configurations.runtimeClasspath
+	
+	doFirst {
+        // 不要なタスクが走らないようにする
+        tasks.withType(JavaCompile).configureEach { it.enabled = false }
+        tasks.withType(ProcessResources).configureEach { it.enabled = false }
+    }
 }
 
 
