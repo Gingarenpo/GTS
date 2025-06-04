@@ -5,6 +5,7 @@ import com.gfactory.core.mqo.MQOObject;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficSign;
 import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSTrafficSignConfig;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.util.ResourceLocation;
 
@@ -26,6 +27,7 @@ public class GTSTileEntityTrafficSignRenderer extends GTSTileEntityRenderer<GTST
         if (body == null || texture == null) return;
 
         this.bindTexture(texture);
+        GlStateManager.translate(0, 0, -0.5+te.getDepth());
         body.draw();
     }
 }

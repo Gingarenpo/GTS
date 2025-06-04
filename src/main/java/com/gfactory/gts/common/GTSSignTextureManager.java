@@ -1,15 +1,15 @@
 package com.gfactory.gts.common;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.util.ResourceLocation;
+import org.lwjgl.opengl.GLContext;
 
-import javax.imageio.ImageIO;
 import java.awt.*;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -33,6 +33,11 @@ public class GTSSignTextureManager {
      * 114対応地名板のキャッシュ格納場所
      */
     private HashMap<GTS114Sign, ResourceLocation> sign114 = new HashMap<>();
+
+    /**
+     * オリジナルのBufferedImageも保持しておく
+     */
+    private HashMap<GTS114Sign, BufferedImage> sign114Original = new HashMap<>();
 
     private GTSSignTextureManager() {}
 
@@ -58,6 +63,17 @@ public class GTSSignTextureManager {
     }
 
     /**
+     * 指定した地名板の原本データを返す。ない場合は作る。nullになることもある。
+     * @param info
+     * @return
+     */
+    public BufferedImage getBufferedTexture(GTS114Sign info) {
+        if (this.sign114.containsKey(info)) return this.sign114Original.get(info);
+        this.createTexture(info);
+        return this.sign114Original.get(info);
+    }
+
+    /**
      * 指定した地名板情報を用いて、テクスチャを作成する。
      * このテクスチャは地名板のテクスチャに適合された状態で保存される。
      * 解像度はそこまで高くないものにしているため近すぎると死ぬ
@@ -65,6 +81,8 @@ public class GTSSignTextureManager {
      * @return 作成したResourceLocation。作成できなかった場合はnull
      */
     private ResourceLocation createTexture(GTS114Sign info) {
+        // OpenGLが使用できない場合に呼び出されることもあるのでその場合はnull返しておく
+        if (GLContext.getCapabilities() == null) return null;
         // 幅固定か幅合わせで地名板の大きさが変わる
         // 一旦現時点では幅固定のみを対象とする
         int res = 512; // 解像度（1）
@@ -141,7 +159,6 @@ public class GTSSignTextureManager {
         int y = (int) (MARGIN + borderWidth + paddingHeightEdge + jpTl.getAscent() + jpTl.getDescent());
         for (int i = 0; i < info.japanese.length(); i++) {
             char text = info.japanese.charAt(i);
-            System.out.println(jpScale);
             int x = (int) (jpPadding + (MARGIN / jpScale + borderWidth / jpScale + paddingWidthEdge / jpScale + i * paddingText + i * 200));
             g.setStroke(new BasicStroke(1));
             g.drawString(String.valueOf(text), x, y);
@@ -158,13 +175,27 @@ public class GTSSignTextureManager {
         enTl.draw(g, x, y);
         g.setTransform(origin); // 戻す
 
+        // このテクスチャを1024x1024のテクスチャに落とし込む
+        // ただし、余白として10%残す必要があるため、922px四方に落とし込む
+        // 表裏を考えて配置する
+        BufferedImage resizeImage = new BufferedImage(1024, 1024, BufferedImage.TYPE_3BYTE_BGR);
+        Graphics2D rg = resizeImage.createGraphics();
+        rg.setColor(info.color);
+        rg.fillRect(0, 0, 1024, 1024);
+        rg.setRenderingHint(RenderingHints.KEY_INTERPOLATION, RenderingHints.VALUE_INTERPOLATION_BICUBIC);
+        rg.setRenderingHint(RenderingHints.KEY_RENDERING, RenderingHints.VALUE_RENDER_QUALITY);
+        rg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+        rg.drawImage(image, 0, 0, 922, 461, null);
 
-        try {
-            ImageIO.write(image, "png", new File("G:\\test.png"));
-        } catch (IOException e) {
-            throw new RuntimeException(e);
-        }
-        return null;
+        // これで保存
+        this.sign114Original.put(info, image);
+
+        // ダイナミックテクスチャを作成
+        ResourceLocation result = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(info.toString(), new DynamicTexture(resizeImage));
+        this.sign114.put(info, result);
+
+        return result;
+
 
     }
 
@@ -192,12 +223,12 @@ public class GTSSignTextureManager {
         /**
          * 日本語部分
          */
-        public String japanese = "薄型小学校入口";
+        public String japanese = "サンプル";
 
         /**
          * 英字部分
          */
-        public String english = "Usugata shogakko iriguchi";
+        public String english = "Sample";
 
         /**
          * 地名板の色
@@ -212,7 +243,7 @@ public class GTSSignTextureManager {
         /**
          * 地名板の日本語部分のフォント
          */
-        public String japaneseFont = "A-SK ナール Min2 E";
+        public String japaneseFont = "A-SK Nar Min2 E";
 
         /**
          * 地名板の英語部分のフォント

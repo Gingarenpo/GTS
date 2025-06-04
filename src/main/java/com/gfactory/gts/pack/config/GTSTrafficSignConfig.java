@@ -13,5 +13,6 @@ public class GTSTrafficSignConfig extends GTSConfig<GTSConfig.GTSTexture> {
         this.model = GTSPack.DUMMY;
         this.textures = new GTSTexture();
         this.textures.base = GTSPack.DUMMY;
+        this.size = 0.5f;
     }
 }
