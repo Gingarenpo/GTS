@@ -1,8 +1,10 @@
 package com.gfactory.gts.minecraft.block;
 
+import com.gfactory.gts.minecraft.gui.GTSGuiTrafficPole;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficPole;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -63,7 +65,16 @@ public class GTSBlockTrafficPole extends GTSBlock<GTSTileEntityTrafficPole> {
      */
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        return false;
+        if (!worldIn.isRemote) return false; // サーバーでは何も行わない
+        if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
+
+        TileEntity te = worldIn.getTileEntity(pos);
+        if (!(te instanceof GTSTileEntityTrafficPole)) return false;
+
+        // GUIを出す
+        Minecraft.getMinecraft().displayGuiScreen(new GTSGuiTrafficPole((GTSTileEntityTrafficPole) te));
+
+        return true;
     }
 
     @Override
