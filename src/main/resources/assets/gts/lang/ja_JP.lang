@@ -30,31 +30,24 @@ gts.exception.script_engine=スクリプトエンジンの起動に失敗しま�
 gts.exception.script_engine.notfound=「%1$s」は存在しません。
 gts.exception.script_engine.eval=スクリプトの実行に失敗しました -> %1$s
 gts.exception.script_engine.io=スクリプトファイルの読み込みに失敗しました。
+gts.exception.texture.create=テクスチャの作成に失敗しました -> %1$s
 
 tile.traffic_light.name=交通信号機
 tile.traffic_controller.name=交通信号制御機
+tile.traffic_pole.name=交通信号柱
+tile.traffic_sign.name=地名板
 itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTSアタッチメント
+item.gts.traffic_arm.name=アーム
 
 gts.gui.model_choose=モデルを確定
+gts.gui.model.none=モデルが見つかりません
 gts.gui.channel.name=チャンネル名
 gts.gui.channel.apply=チャンネル名を確定
-
-gts.cycle.fix.arg1=主道歩灯青時間（Tick）
-gts.cycle.fix.arg2=主道歩灯点滅時間（Tick）
-gts.cycle.fix.arg3=従道歩灯青時間（Tick）
-gts.cycle.fix.arg4=従道歩灯点滅時間（Tick）
-gts.cycle.fix.arg5=車灯黄色時間（Tick）
-gts.cycle.fix.arg6=全赤時間（Tick）
-gts.cycle.script.arg1=スクリプトファイルパス
-
-gts.gui.model.none=モデルが見つかりません
-
 gts.gui.position.apply=モデル描画位置を確定
 gts.gui.position.x=座標X
 gts.gui.position.y=座標Y
 gts.gui.position.z=座標Z
-
 gts.gui.controller.load=サイクルをロード
 gts.gui.controller.save=サイクルをセーブ
 gts.gui.controller.load.done=サイクル情報をロードしました
@@ -63,4 +56,32 @@ gts.gui.controller.save.done=サイクル情報をセーブしました
 gts.gui.controller.save.error=サイクル情報のセーブに失敗しました -> %1$s.
 gts.gui.controller.extension=制御機サイクル情報
 gts.gui.controller.chooser.title=制御機情報のロード・セーブ
-gts.gui.controller.info=%1$dつのサイクルが登録されています
+gts.gui.sign.japanese=日本語部分
+gts.gui.sign.english=英語部分
+gts.gui.sign.color.fore=文字色
+gts.gui.sign.color.back=背景色
+gts.gui.sign.fixed=幅固定地名板？
+gts.gui.sign.width=地名板の幅
+gts.gui.sign.height=地名板の高さ
+gts.gui.sign.depth=地名板の厚み
+gts.gui.sign.apply=各情報を適用
+
+gts.cycle.fix.arg1=主道歩灯青時間（Tick）
+gts.cycle.fix.arg2=主道歩灯点滅時間（Tick）
+gts.cycle.fix.arg3=従道歩灯青時間（Tick）
+gts.cycle.fix.arg4=従道歩灯点滅時間（Tick）
+gts.cycle.fix.arg5=車灯黄色時間（Tick）
+gts.cycle.fix.arg6=全赤時間（Tick）
+
+
+gts.cycle.script.arg1=スクリプトパス
+
+gts.gui.sign.japanese.font=日本語用フォント
+gts.gui.sign.english.font=英語用フォント
+gts.gui.sign.font.available=有効なフォントは以下の文字列です：
+gts.gui.sign.check.font.available=有効なフォント名一覧をログに出力
+gts.gui.sign.message.apply=正常に情報を更新しました
+gts.gui.sign.message.fail=更新に失敗しました。赤文字を確認してください。
+gts.gui.sign.message.fonts=ログに有効なフォントを書き出しました
+
+gts.gui.controller.info=%1$dつのサイクルを登録しました

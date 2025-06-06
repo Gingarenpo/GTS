@@ -48,6 +48,11 @@ public final class MQOObject {
     private MQOVBOData vboData;
 
     /**
+     * このオブジェクトの最小値・最大値
+     */
+    private double[][] minMax;
+
+    /**
      * 指定した名前のMQOObjectを格納する。
      * @param name オブジェクト名
      */
@@ -411,5 +416,50 @@ public final class MQOObject {
 
     public void setSmoothing(double smoothing) {
         this.smoothing = smoothing;
+    }
+
+
+    /**
+     * このオブジェクトのXYZそれぞれに対し、最小値と最大値を返す。
+     * 戻り値は1次元が3、2次元が2の配列となる。
+     * @return XYZ（この順番）におけるMinMax（この順番）
+     */
+    public double[][] getAxisMinMax() {
+        if (this.minMax == null) return calcAxisMinMax();
+        return this.minMax;
+    }
+
+    /**
+     * このモデルのバウンディングボックスを返す。
+     * 戻り値はMQOVertexとなり、0番目に最小値、1番目に最大値が格納されている
+     * @return バウンディングボックスのXYZ最小値～XYZ最大値
+     */
+    public MQOVertex[] getBoundingBox() {
+        double[][] minMax = this.getAxisMinMax();
+        return new MQOVertex[] {new MQOVertex(minMax[0][0], minMax[1][0], minMax[2][0]), new MQOVertex(minMax[0][1], minMax[1][1], minMax[2][1])};
+    }
+
+    /**
+     * 計算が重いためキャッシュするために別だし
+     * @return 各軸における最小値と最大値
+     */
+    private double[][] calcAxisMinMax() {
+        double minX = Double.POSITIVE_INFINITY;
+        double minY = Double.POSITIVE_INFINITY;
+        double minZ = Double.POSITIVE_INFINITY;
+        double maxX = Double.NEGATIVE_INFINITY;
+        double maxY = Double.NEGATIVE_INFINITY;
+        double maxZ = Double.NEGATIVE_INFINITY;
+
+        for (MQOVertex v: this.vertexs) {
+            minX = Math.min(minX, v.getX());
+            maxX = Math.max(maxX, v.getX());
+            minY = Math.min(minY, v.getY());
+            maxY = Math.max(maxY, v.getY());
+            minZ = Math.min(minZ, v.getZ());
+            maxZ = Math.max(maxZ, v.getZ());
+        }
+        this.minMax = new double[][] { new double[] {minX, maxX},  new double[] {minY, maxY},  new double[] {minZ, maxZ}};
+        return new double[][] { new double[] {minX, maxX},  new double[] {minY, maxY},  new double[] {minZ, maxZ}};
     }
 }

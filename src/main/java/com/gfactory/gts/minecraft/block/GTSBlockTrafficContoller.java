@@ -77,6 +77,7 @@ public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficContr
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) return false; // サーバーでは何も行わない
+        if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
         // アイテムを持っているかチェックする（それ以外はGUIなのでアーリーリターンが使えずifのネストになっている
         ItemStack item = playerIn.getHeldItem(hand);
         if (item.isItemEqual(new ItemStack(GTSItems.ATTACHMENT))) {

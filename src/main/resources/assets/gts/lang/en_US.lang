@@ -34,11 +34,13 @@ gts.exception.script_engine=Cannot initialize script engine
 gts.exception.script_engine.notfound=File '%1$s' is not found.
 gts.exception.script_engine.eval=Cannot run script -> %1$s
 gts.exception.script_engine.io=Cannot read script file
+gts.exception.texture.create=Cannot create texture -> %1$s
 
 # マイクラワールド内翻訳関連
 tile.traffic_light.name=Trafic Light
 tile.traffic_controller.name=Traffic Controller
 tile.traffic_pole.name=Traffic Pole
+tile.traffic_sign.name=Traffic Sign
 itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTS Attachment
 item.gts.traffic_arm.name=Traffic Arm
@@ -61,6 +63,22 @@ gts.gui.controller.save.error=Cannot save controller info -> %1$s.
 gts.gui.controller.extension=Controller Info File
 gts.gui.controller.chooser.title=Load File
 gts.gui.controller.info=%1$d Cycle(s) registered.
+gts.gui.sign.japanese=Japanese
+gts.gui.sign.english=English
+gts.gui.sign.japanese.font=Japanese Font
+gts.gui.sign.english.font=English Font
+gts.gui.sign.color.fore=ForeGroundColor
+gts.gui.sign.color.back=BackGroundColor
+gts.gui.sign.fixed=This is fixed width
+gts.gui.sign.width=Width
+gts.gui.sign.height=Height
+gts.gui.sign.depth=Depth
+gts.gui.sign.apply=Apply Sign info
+gts.gui.sign.font.available=Available Fonts are ...
+gts.gui.sign.check.font.available=Output Available Fonts (to LOG)
+gts.gui.sign.message.apply=Apply Sign info is done.
+gts.gui.sign.message.fail=Cannot apply. please check red color string.
+gts.gui.sign.message.fonts=Avaliable fonts are written to log.
 
 # 組み込み関連
 gts.cycle.fix.arg1=MainPed Green Tick

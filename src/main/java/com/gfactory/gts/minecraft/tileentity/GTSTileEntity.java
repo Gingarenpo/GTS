@@ -1,6 +1,9 @@
 package com.gfactory.gts.minecraft.tileentity;
 
 import com.gfactory.core.helper.GNBTHelper;
+import com.gfactory.core.mqo.MQO;
+import com.gfactory.core.mqo.MQOObject;
+import com.gfactory.core.mqo.MQOVertex;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSConfig;
@@ -9,6 +12,7 @@ import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.math.AxisAlignedBB;
 
 import javax.annotation.Nullable;
 import java.util.Map;
@@ -42,6 +46,11 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
     protected double posX;
     protected double posY;
     protected double posZ;
+
+    /**
+     * 現在描画されているモデルの最小値・最大値
+     */
+    protected transient double[][] modelMinMax;
 
     public GTSTileEntity() {
     }
@@ -245,5 +254,43 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
     @Override
     public boolean equals(Object obj) {
         return (obj instanceof GTSTileEntity && this.pos != null && this.pos.equals(((GTSTileEntity) obj).pos));
+    }
+
+    /**
+     * このTileEntityがレンダリングされるべき領域を返す
+     * TODO: 重い場合は消す
+     * @return バウンディングボックス
+     */
+    @Override
+    public AxisAlignedBB getRenderBoundingBox() {
+        AxisAlignedBB aabb = super.getRenderBoundingBox();
+        if (this.pack == null || this.config == null) return aabb;
+        MQO model = this.pack.getResizingModels(this.config.getModel(), this.config.getSize());
+        for (MQOObject o: model.getObjects()) {
+            MQOVertex[] r = o.getBoundingBox();
+            aabb.union(new AxisAlignedBB(r[0].getX(), r[0].getY(), r[0].getZ(), r[1].getX(), r[1].getY(), r[1].getZ()));
+        }
+        return aabb;
+    }
+
+    protected void calcModelMinMax() {
+        if (this.pack == null || this.config == null) return;
+        MQO model = this.pack.getResizingModels(this.config.getModel(), this.config.getSize());
+        double[][] result = new double[][] {new double[]{0, 0}, new double[]{0, 0}, new double[]{0, 0}};
+        for (MQOObject o: model.getObjects()) {
+            double[][] r = o.getAxisMinMax();
+            result[0][0] += r[0][0];
+            result[1][0] += r[1][0];
+            result[2][0] += r[2][0];
+            result[0][1] += r[0][1];
+            result[1][1] += r[1][1];
+            result[2][1] += r[2][1];
+        }
+        this.modelMinMax = result;
+    }
+
+    public double[][] getModelMinMax() {
+        if (this.modelMinMax == null) this.calcModelMinMax();
+        return this.modelMinMax;
     }
 }

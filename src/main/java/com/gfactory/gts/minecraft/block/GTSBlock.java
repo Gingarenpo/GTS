@@ -2,8 +2,8 @@ package com.gfactory.gts.minecraft.block;
 
 import com.gfactory.core.helper.GMathHelper;
 import com.gfactory.gts.minecraft.GTS;
+import com.gfactory.gts.minecraft.item.GTSItems;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntity;
-import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
 import net.minecraft.block.BlockContainer;
 import net.minecraft.block.material.Material;
 import net.minecraft.block.state.IBlockState;
@@ -11,13 +11,14 @@ import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
+import net.minecraft.util.EnumFacing;
+import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.IBlockAccess;
 import net.minecraft.world.World;
 
 import javax.annotation.Nullable;
-import java.lang.reflect.Constructor;
 
 /**
  * 結構な割合で使う共通のものはここに残しておく。
@@ -101,7 +102,19 @@ public abstract class GTSBlock<T extends GTSTileEntity> extends BlockContainer {
         }
         // 角度情報を入れる
         EntityPlayer ep = (EntityPlayer) placer;
-        // System.out.println(GMathHelper.normalizeAngle(-ep.getPitchYaw().y + 180));
-        te.setAngle(GMathHelper.normalizeAngle(-ep.getPitchYaw().y + 180)); // プレイヤーと逆向きに配置
+        double angle = GMathHelper.normalizeAngle(-ep.getPitchYaw().y + 180);
+        if (ep.isSneaking()) {
+            // スニークしながら設置したら90度単位にスナップする
+            angle = Math.round(angle / 90f) * 90f;
+        }
+
+        te.setAngle(angle); // プレイヤーと逆向きに配置
+    }
+
+    @Override
+    public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
+        // 持っているアイテムがアームだったら無視する
+        if (playerIn.getHeldItem(hand).isItemEqual(new ItemStack(GTSItems.TRAFFIC_ARM))) return false;
+        return true;
     }
 }

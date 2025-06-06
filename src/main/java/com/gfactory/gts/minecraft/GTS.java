@@ -2,6 +2,7 @@ package com.gfactory.gts.minecraft;
 
 import com.gfactory.gts.common.GTSClassScanner;
 import com.gfactory.gts.common.GTSPackLoader;
+import com.gfactory.gts.common.GTSSignTextureManager;
 import com.gfactory.gts.common.controller.GTSCycle;
 import com.gfactory.gts.common.controller.GTSPhase;
 import com.gfactory.gts.minecraft.proxy.GTSProxy;
@@ -61,6 +62,8 @@ public class GTS {
      * クリエイティブタブ（GTSのブロックはここに集約する）
      */
     public static CreativeTabs TAB;
+
+    public static GTSSignTextureManager SIGN_MANAGER;
 
     public static Gson GSON;
 

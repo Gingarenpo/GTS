@@ -1,5 +1,6 @@
 package com.gfactory.gts.minecraft.tileentity;
 
+import com.gfactory.core.helper.GNBTHelper;
 import com.gfactory.core.mqo.MQOFace;
 import com.gfactory.core.mqo.MQOObject;
 import com.gfactory.core.mqo.MQOVertex;
@@ -68,16 +69,48 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
         this.config.setDummy();
         this.texture = null;
         this.info = new GTSSignTextureManager.GTS114Sign();
+        this.info.japanese = "ダミー";
+        this.info.english = "DUMMY";
 
     }
 
     @Override
     public void readDataFromNBT(NBTTagCompound compound) {
+        // 座標たち
+        this.width = GNBTHelper.getDoubleWithValue(compound, "gts_sign_width", this.width);
+        this.height = GNBTHelper.getDoubleWithValue(compound, "gts_sign_height", this.height);
+        this.depth = GNBTHelper.getDoubleWithValue(compound, "gts_sign_depth", this.depth);
 
+        // テクスチャがある場合はそれを読み込む
+        if (compound.hasKey("gts_sign_texture")) {
+            this.texture = new ResourceLocation(compound.getString("gts_sign_texture"));
+            this.info = null;
+        }
+        else {
+            // 地名板の情報を読み込む
+            this.texture = null;
+            this.info = new GTSSignTextureManager.GTS114Sign();
+            this.info.readFromNBT(compound.getCompoundTag("gts_sign_info"));
+        }
     }
 
     @Override
     public NBTTagCompound writeDataToNBT(NBTTagCompound compound) {
+        // 座標たち
+        compound.setDouble("gts_sign_width", this.width);
+        compound.setDouble("gts_sign_height", this.height);
+        compound.setDouble("gts_sign_depth", this.depth);
+
+        // 地名板の種類
+        if (this.texture != null && !this.is114Sign()) {
+            // テクスチャ直指定の場合はそれを入れる（リソースロケーションを文字列にして）
+            compound.setString("gts_sign_texture", texture.toString());
+        }
+        if (this.is114Sign()) {
+            // 地名板指定の場合はその地名板の情報をすべて入れる
+            compound.setTag("gts_sign_info", this.info.writeToNBT());
+        }
+
         return compound;
     }
 
@@ -181,6 +214,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
 
     public void setDepth(double depth) {
         this.depth = depth;
+        this.buildObject();
     }
 
     public double getHeight() {
@@ -189,6 +223,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
 
     public void setHeight(double height) {
         this.height = height;
+        this.buildObject();
     }
 
     public void setObject(MQOObject object) {
@@ -196,8 +231,8 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
     }
 
     public ResourceLocation getTexture() {
-        if (this.texture == null && this.is114Sign()) {
-            this.texture = GTSSignTextureManager.getInstance().getResourceLocation(this.info);
+        if ((this.texture == null || this.texture.equals(GTSSignTextureManager.PLACE_HOLDER)) && this.is114Sign()) {
+            this.texture = GTS.SIGN_MANAGER.getResourceLocation(this.info);
         }
         return texture;
     }
@@ -212,6 +247,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
 
     public void setWidth(double width) {
         this.width = width;
+        this.buildObject();
     }
 
     public GTSSignTextureManager.GTS114Sign getInfo() {
@@ -228,5 +264,28 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
      */
     public boolean is114Sign() {
         return this.info != null;
+    }
+
+    @Override
+    public String toString() {
+        return "GTSTileEntityTrafficSign{" +
+                "depth=" + depth +
+                ", width=" + width +
+                ", height=" + height +
+                ", texture=" + texture +
+                ", info=" + info +
+                ", object=" + object +
+                ", angle=" + angle +
+                ", config=" + config +
+                ", modelMinMax=" + Arrays.toString(modelMinMax) +
+                ", pack=" + pack +
+                ", posX=" + posX +
+                ", posY=" + posY +
+                ", posZ=" + posZ +
+                ", blockType=" + blockType +
+                ", pos=" + pos +
+                ", tileEntityInvalid=" + tileEntityInvalid +
+                ", world=" + world +
+                "} " + super.toString();
     }
 }

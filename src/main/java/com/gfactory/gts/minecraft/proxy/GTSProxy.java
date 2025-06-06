@@ -1,5 +1,6 @@
 package com.gfactory.gts.minecraft.proxy;
 
+import com.gfactory.gts.common.GTSSignTextureManager;
 import com.gfactory.gts.common.capability.GTSCapabilities;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketItemNBT;
@@ -26,6 +27,8 @@ import java.io.File;
  */
 public class GTSProxy {
     public void preInit(FMLPreInitializationEvent event) {
+        // テクスチャマネージャーの登録
+        GTS.SIGN_MANAGER = GTSSignTextureManager.getInstance();
 
         // TileEntityの登録
         GameRegistry.registerTileEntity(GTSTileEntityTrafficLight.class, new ResourceLocation(GTS.MODID, "traffic_light"));

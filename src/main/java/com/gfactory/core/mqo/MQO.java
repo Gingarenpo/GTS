@@ -3,7 +3,6 @@ package com.gfactory.core.mqo;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 /**
  * MQOファイル（Ver4.7）までに対応するように作り直した、MQOファイル内の情報を扱うクラス。

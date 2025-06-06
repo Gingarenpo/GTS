@@ -1,9 +1,11 @@
 package com.gfactory.gts.common;
 
+import com.gfactory.gts.minecraft.GTS;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
+import net.minecraft.client.resources.I18n;
+import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import org.lwjgl.opengl.GLContext;
 
 import java.awt.*;
 import java.awt.font.FontRenderContext;
@@ -14,6 +16,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Objects;
+import java.util.concurrent.*;
 
 /**
  * 地名板を自動生成する（文字とか入れて）場合、
@@ -32,14 +35,33 @@ public class GTSSignTextureManager {
     /**
      * 114対応地名板のキャッシュ格納場所
      */
-    private HashMap<GTS114Sign, ResourceLocation> sign114 = new HashMap<>();
+    private final HashMap<GTS114Sign, ResourceLocation> sign114 = new HashMap<>();
 
     /**
      * オリジナルのBufferedImageも保持しておく
      */
-    private HashMap<GTS114Sign, BufferedImage> sign114Original = new HashMap<>();
+    private final HashMap<GTS114Sign, BufferedImage> sign114Original = new HashMap<>();
 
-    private GTSSignTextureManager() {}
+    /**
+     * スレッドの実行状況を格納している管理マップ
+     */
+    private final ConcurrentHashMap<GTS114Sign, Future<BufferedImage>> pendingTasks = new ConcurrentHashMap<>();
+
+    /**
+     * テクスチャは最大4つのスレッドで進行する
+     */
+    private final ExecutorService executor = Executors.newFixedThreadPool(4);
+
+    /**
+     * 初回インスタンス作成時に必ず作成する、デフォルトテクスチャ
+     */
+    public static final GTS114Sign PLACE_HOLDER_INFO = new GTS114Sign();
+
+    public static ResourceLocation PLACE_HOLDER;
+
+    private GTSSignTextureManager() {
+        this.createThread(PLACE_HOLDER_INFO, true);
+    }
 
     /**
      * インスタンスを取得する
@@ -50,16 +72,73 @@ public class GTSSignTextureManager {
         return instance;
     }
 
+    private void createThread(GTS114Sign info, boolean dummy) {
+        // 作成を開始するため、新しくスレッドを追加する
+        Callable<BufferedImage> task = () -> this.createTexture(info);
+        Future<BufferedImage> future = executor.submit(task);
+
+        // 実行中としてタスクを記録
+        this.pendingTasks.put(info, future);
+
+        // 完了を検出し、タスクの消去などを行うスレッドを定義
+        executor.submit(() -> {
+            try {
+                BufferedImage result = future.get();
+                if (result != null) {
+                    // 既に完了していた場合
+                    synchronized (this.sign114Original) {
+                        this.sign114Original.put(info, result); // キャッシュを格納
+                        Minecraft.getMinecraft().addScheduledTask(() -> {
+                            // OpenGLの利用はメインスレッドからでないとできないため、こちらで登録を行う
+                            ResourceLocation r = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(info.toString(), new DynamicTexture(result));
+                            if (!dummy) {
+                                synchronized (this.sign114) {
+                                    this.sign114.put(info, r);
+                                }
+                            }
+                            else {
+                                PLACE_HOLDER = r;
+                            }
+                        });
+                    }
+                }
+            } catch (Exception e) {
+                // 何かしらの例外を拾った場合は通知を出す
+                GTS.LOGGER.warn(I18n.format("gts.exception.texture.create", e.getLocalizedMessage()));
+            } finally {
+                // 失敗しようが成功しようが最終的にはタスクを実行終了するのでキューから消す
+                pendingTasks.remove(info);
+            }
+        });
+    }
+
     /**
      * 指定した地名板情報を用いて、キャッシュされたテクスチャの中から探す。
-     * もしあれば、それを返す。ない場合は作成を試み、作成したテクスチャを返す。
-     * ただし、作成に失敗することもある。その場合はnullを返す。
+     * もしあれば、それを返す。ない場合は作成を試みる。
+     *
      * @param info 地名板の情報
-     * @return その地名板を作成、あるいはキャッシュしたテクスチャのResourceLocation。作成できなかった場合はnull
+     * @return その地名板を作成、あるいはキャッシュしたテクスチャのResourceLocation。ない場合はプレースホルダー
      */
     public ResourceLocation getResourceLocation(GTS114Sign info) {
-        if (this.sign114.containsKey(info)) return this.sign114.get(info); // キャッシュがあればそれを返す
-        return this.createTexture(info);
+        synchronized (this.sign114) {
+            // キャッシュを同期し、その中に既にテクスチャがあれば返す
+            if (this.sign114.containsKey(info)) {
+                return this.sign114.get(info);
+            }
+        }
+
+        // 生成中ならばnullを返す
+        if (pendingTasks.containsKey(info)) return null;
+
+        this.createThread(info, false);
+
+        // 一応デフォルトを探し、あればそれを返す
+        synchronized (this.sign114) {
+            if (PLACE_HOLDER != null) {
+                return PLACE_HOLDER;
+            }
+            return null;
+        }
     }
 
     /**
@@ -78,11 +157,9 @@ public class GTSSignTextureManager {
      * このテクスチャは地名板のテクスチャに適合された状態で保存される。
      * 解像度はそこまで高くないものにしているため近すぎると死ぬ
      * @param info 地名板の情報
-     * @return 作成したResourceLocation。作成できなかった場合はnull
+     * @return 作成したBufferedImage。作成できなかった場合はnull
      */
-    private ResourceLocation createTexture(GTS114Sign info) {
-        // OpenGLが使用できない場合に呼び出されることもあるのでその場合はnull返しておく
-        if (GLContext.getCapabilities() == null) return null;
+    private BufferedImage createTexture(GTS114Sign info) {
         // 幅固定か幅合わせで地名板の大きさが変わる
         // 一旦現時点では幅固定のみを対象とする
         int res = 512; // 解像度（1）
@@ -187,17 +264,10 @@ public class GTSSignTextureManager {
         rg.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         rg.drawImage(image, 0, 0, 922, 461, null);
 
-        // これで保存
-        this.sign114Original.put(info, image);
-
         // ダイナミックテクスチャを作成
-        ResourceLocation result = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(info.toString(), new DynamicTexture(resizeImage));
-        this.sign114.put(info, result);
-
-        return result;
-
-
+        return resizeImage;
     }
+
 
     /**
      * 現在利用可能なフォントの一覧を取得する
@@ -223,12 +293,12 @@ public class GTSSignTextureManager {
         /**
          * 日本語部分
          */
-        public String japanese = "サンプル";
+        public String japanese = "生成中";
 
         /**
          * 英字部分
          */
-        public String english = "Sample";
+        public String english = "Generating";
 
         /**
          * 地名板の色
@@ -274,12 +344,41 @@ public class GTSSignTextureManager {
         public boolean equals(Object o) {
             if (!(o instanceof GTS114Sign)) return false;
             GTS114Sign that = (GTS114Sign) o;
-            return rounded == that.rounded && border == that.border && widthFix == that.widthFix && Objects.equals(japanese, that.japanese) && Objects.equals(english, that.english) && Objects.equals(color, that.color) && Objects.equals(textColor, that.textColor) && Objects.equals(japaneseFont, that.japaneseFont) && Objects.equals(englishFont, that.englishFont);
+            return rounded == that.rounded && border == that.border && widthFix == that.widthFix && Double.compare(aspect, that.aspect) == 0 && Objects.equals(japanese, that.japanese) && Objects.equals(english, that.english) && Objects.equals(color, that.color) && Objects.equals(textColor, that.textColor) && Objects.equals(japaneseFont, that.japaneseFont) && Objects.equals(englishFont, that.englishFont);
         }
 
         @Override
         public int hashCode() {
-            return Objects.hash(japanese, english, color, textColor, japaneseFont, englishFont, rounded, border, widthFix);
+            return Objects.hash(japanese, english, color, textColor, japaneseFont, englishFont, rounded, border, widthFix, aspect);
+        }
+
+        public void readFromNBT(NBTTagCompound compound) {
+            this.japanese = compound.getString("japanese");
+            this.english = compound.getString("english");
+            this.japaneseFont = compound.getString("japanese_font");
+            this.englishFont = compound.getString("english_font");
+            this.color = new Color(compound.getInteger("color"));
+            this.textColor = new Color(compound.getInteger("text_color"));
+            this.aspect = compound.getDouble("aspect");
+            this.widthFix = compound.getBoolean("width_fix");
+            this.rounded = compound.getBoolean("rounded");
+            this.border = compound.getBoolean("border");
+        }
+
+        public NBTTagCompound writeToNBT() {
+            NBTTagCompound compound = new NBTTagCompound();
+            compound.setString("japanese", japanese);
+            compound.setString("english", english);
+            compound.setString("japanese_font", japaneseFont);
+            compound.setString("english_font", englishFont);
+            compound.setInteger("color", color.getRGB());
+            compound.setInteger("text_color", textColor.getRGB());
+            compound.setDouble("aspect", aspect);
+            compound.setBoolean("width_fix", widthFix);
+            compound.setBoolean("rounded", rounded);
+            compound.setBoolean("border", border);
+
+            return compound;
         }
     }
 }

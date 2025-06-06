@@ -46,6 +46,7 @@ public class GTSBlockTrafficLight extends GTSBlock<GTSTileEntityTrafficLight> {
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) return false; // サーバーでは何も行わない
+        if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
 
         // プレイヤーが持っているアイテムを取得
         ItemStack item = playerIn.getHeldItem(hand);

@@ -70,9 +70,9 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
             if (this.posZ.getText().isEmpty()) this.posZ.setText("0");
             // 座標を検出
             try {
-                double posX = Double.parseDouble(this.posX.getText());
-                double posY = Double.parseDouble(this.posY.getText());
-                double posZ = Double.parseDouble(this.posZ.getText());
+                double posX = Math.round(Double.parseDouble(this.posX.getText()) * 1000f) / 1000f;
+                double posY = Math.round(Double.parseDouble(this.posY.getText()) * 1000f) / 1000f;
+                double posZ = Math.round(Double.parseDouble(this.posZ.getText()) * 1000f) / 1000f;
 
                 // TileEntity変更
                 this.tileEntity.setPosX(posX);
@@ -104,13 +104,13 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
     @Override
     public void initGui() {
         // 描画位置を決められるようにする入力欄
-        this.addButton(new GuiButton(20001, this.width / 2 + MARGIN, this.height / 2 + this.fontRenderer.FONT_HEIGHT * 4 + MARGIN * 4, this.width / 2 - MARGIN * 2, 20, I18n.format("gts.gui.position.apply")));
-        this.posX = new GuiTextField(20002, fontRenderer, this.width / 2 + MARGIN * 2, this.height / 2 + this.fontRenderer.FONT_HEIGHT * 3 + MARGIN * 3, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
-        this.posY = new GuiTextField(20003, fontRenderer, this.width / 2 + MARGIN * 3 + this.width / 6, this.height / 2 + this.fontRenderer.FONT_HEIGHT * 3 + MARGIN * 3, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
-        this.posZ = new GuiTextField(20004, fontRenderer, this.width / 2 + MARGIN * 4 + this.width / 3, this.height / 2 + this.fontRenderer.FONT_HEIGHT * 3 + MARGIN * 3, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
-        this.posX.setText(String.valueOf(tileEntity.getPosX()));
-        this.posY.setText(String.valueOf(tileEntity.getPosY()));
-        this.posZ.setText(String.valueOf(tileEntity.getPosZ()));
+        this.addButton(new GuiButton(20001, this.width / 2 + MARGIN, this.height - MARGIN - 20, this.width / 2 - MARGIN * 2, 20, I18n.format("gts.gui.position.apply")));
+        this.posX = new GuiTextField(20002, fontRenderer, this.width / 2 + MARGIN * 2, this.height - MARGIN * 2 - 20 - fontRenderer.FONT_HEIGHT, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
+        this.posY = new GuiTextField(20003, fontRenderer, this.width / 2 + MARGIN * 3 + this.width / 6, this.height - MARGIN * 2 - 20 - fontRenderer.FONT_HEIGHT, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
+        this.posZ = new GuiTextField(20004, fontRenderer, this.width / 2 + MARGIN * 4 + this.width / 3, this.height - MARGIN * 2 - 20 - fontRenderer.FONT_HEIGHT, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
+        this.posX.setText(String.valueOf(Math.round(tileEntity.getPosX() * 1000f) / 1000f));
+        this.posY.setText(String.valueOf(Math.round(tileEntity.getPosY() * 1000f) / 1000f));
+        this.posZ.setText(String.valueOf(Math.round(tileEntity.getPosZ() * 1000f) / 1000f));
     }
 
     @Override
@@ -123,9 +123,9 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
         this.posX.drawTextBox();
         this.posY.drawTextBox();
         this.posZ.drawTextBox();
-        this.drawString(fontRenderer, I18n.format("gts.gui.position.x"), this.width / 2 + MARGIN * 3, this.height / 2 + this.fontRenderer.FONT_HEIGHT * 2 + MARGIN * 2, 0xFFFFFF);
-        this.drawString(fontRenderer, I18n.format("gts.gui.position.y"), this.width / 2 + MARGIN * 3 + this.width / 6, this.height / 2 + this.fontRenderer.FONT_HEIGHT * 2 + MARGIN * 2, 0xFFFFFF);
-        this.drawString(fontRenderer, I18n.format("gts.gui.position.z"), this.width / 2 + MARGIN * 3 + this.width / 3, this.height / 2 + this.fontRenderer.FONT_HEIGHT * 2 + MARGIN * 2, 0xFFFFFF);
+        this.drawString(fontRenderer, I18n.format("gts.gui.position.x"), this.width / 2 + MARGIN * 3, this.posX.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
+        this.drawString(fontRenderer, I18n.format("gts.gui.position.y"), this.width / 2 + MARGIN * 3 + this.width / 6, this.posY.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
+        this.drawString(fontRenderer, I18n.format("gts.gui.position.z"), this.width / 2 + MARGIN * 3 + this.width / 3, this.posZ.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
 
 
         // GUIタイトル
