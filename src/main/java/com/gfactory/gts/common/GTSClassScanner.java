@@ -2,6 +2,7 @@ package com.gfactory.gts.common;
 
 import com.gfactory.gts.common.controller.GTSCycle;
 import com.gfactory.gts.common.controller.GTSPhase;
+import com.gfactory.gts.pack.config.GTSConfig;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;
 import io.github.classgraph.ClassInfoList;
@@ -58,6 +59,27 @@ public class GTSClassScanner {
 
                 // クラスを追加する（未検査キャスト出るけど仕方ない
                 result.add((Class<? extends GTSPhase>) classInfo.loadClass());
+            }
+        }
+
+        return result;
+    }
+
+    public static List<Class<? extends GTSConfig>> findConfigClass() {
+        List<Class<? extends GTSConfig>> result = new ArrayList<>(); // 結果を保持する変数を作成
+
+        // ClassGraphを使用してクラスをスキャン
+        try (ScanResult scanResult = new ClassGraph().enableClassInfo().acceptPackages("com.gfactory.gts").scan()) {
+            // サブクラスのリストを取得
+            ClassInfoList subclasses = scanResult.getSubclasses(GTSConfig.class.getName());
+
+            // 全部のクラスをまとめて入れる
+            for (ClassInfo classInfo: subclasses) {
+                // 抽象クラスも入ってくるのでそれは省く
+                if (classInfo.isAbstract()) continue;
+
+                // クラスを追加する（未検査キャスト出るけど仕方ない
+                result.add((Class<? extends GTSConfig>) classInfo.loadClass());
             }
         }
 

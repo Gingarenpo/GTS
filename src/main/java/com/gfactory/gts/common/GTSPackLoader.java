@@ -1,14 +1,19 @@
 package com.gfactory.gts.common;
 
 import com.gfactory.gts.minecraft.GTS;
+import com.gfactory.gts.pack.GTSMemoryResourcePack;
 import com.gfactory.gts.pack.GTSPack;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
+import net.minecraft.client.resources.IResourcePack;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.ProgressManager;
 
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.zip.ZipInputStream;
 
 /**
@@ -83,7 +88,10 @@ public class GTSPackLoader {
             }
         }
 
-        // 3. 後始末とかは任せたぞ
+        // 3. オーディオ登録
+        this.loadAudio();
+
+        // 4. 後始末とかは任せたぞ
         ProgressManager.pop(bar);
         GTS.LOGGER.info(I18n.format("gts.message.pack_search.finish", this.packs.size()));
     }
@@ -132,5 +140,27 @@ public class GTSPackLoader {
      */
     public ArrayList<GTSPack> getPacks() {
         return packs;
+    }
+
+    /**
+     * パックを読み込みきった後に最後に呼び出す。
+     * このパックのサウンドをイベントとして登録する。
+     *
+     */
+    public void loadAudio() {
+        // マネージャーにリソースパックを読み込ませる
+        // 今まで読み込んだもの全部追加しないといけないようなので取得して読み込む
+        for (GTSPack pack: this.packs) {
+            addDefaultResourcePack(new GTSMemoryResourcePack(pack));
+        }
+
+        Minecraft.getMinecraft().refreshResources(); // 再読み込みをさせて全部のパックを一気に読み込み
+
+    }
+
+
+    private void addDefaultResourcePack(IResourcePack pack) {
+        List<IResourcePack> l = ObfuscationReflectionHelper.getPrivateValue(Minecraft.class, Minecraft.getMinecraft(), "defaultResourcePacks", "field_110449_ao");
+        l.add(pack);
     }
 }

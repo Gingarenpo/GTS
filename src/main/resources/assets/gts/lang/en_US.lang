@@ -23,6 +23,7 @@ gts.message.chat.deselected=%1$s Deselected.
 gts.message.chat.attached=%1$s is now attached to %2$s.
 gts.message.chat.deattached=%1$s is now deattached to %2$s.
 gts.message.chat.selection_override=Warning: Before selected is now overwritten!
+gts.message.chat.no.attached=This object is no attached any controller.
 
 # 例外関連
 gts.exception.argument=At least one of parameter is NULL.
@@ -41,6 +42,7 @@ tile.traffic_light.name=Trafic Light
 tile.traffic_controller.name=Traffic Controller
 tile.traffic_pole.name=Traffic Pole
 tile.traffic_sign.name=Traffic Sign
+tile.traffic_button.name=Traffic Button
 itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTS Attachment
 item.gts.traffic_arm.name=Traffic Arm

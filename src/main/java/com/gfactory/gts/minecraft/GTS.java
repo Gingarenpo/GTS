@@ -6,6 +6,7 @@ import com.gfactory.gts.common.GTSSignTextureManager;
 import com.gfactory.gts.common.controller.GTSCycle;
 import com.gfactory.gts.common.controller.GTSPhase;
 import com.gfactory.gts.minecraft.proxy.GTSProxy;
+import com.gfactory.gts.pack.config.GTSConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.RuntimeTypeAdapterFactory;
@@ -97,11 +98,20 @@ public class GTS {
             GTS.LOGGER.debug(I18n.format("gts.message.find.class", clazz.getName()));
             typeFactory2.registerSubtype(clazz);
         }
+
+        // GTSConfigクラスをスキャンして登録する
+        RuntimeTypeAdapterFactory<GTSConfig> typeFactory3 = RuntimeTypeAdapterFactory.of(GTSConfig.class, "type");
+        for (Class<? extends GTSConfig> clazz: GTSClassScanner.findConfigClass()) {
+            GTS.LOGGER.debug(I18n.format("gts.message.find.class", clazz.getName()));
+            typeFactory3.registerSubtype(clazz);
+        }
+
         // ここでやっとGSONを読み込めるがまあゲーム開始時以降しか使わないはずだから平気。
         // GTSLoaderではここは使わない予定。使う場合はInitで出してしまう。
         GSON = new GsonBuilder()
                 .registerTypeAdapterFactory(typeFactory)
                 .registerTypeAdapterFactory(typeFactory2)
+                .registerTypeAdapterFactory(typeFactory3)
                 .setPrettyPrinting()
                 .create();
 

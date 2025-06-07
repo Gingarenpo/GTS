@@ -11,14 +11,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
+import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.ProgressManager;
 
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Scanner;
@@ -37,7 +35,7 @@ import java.util.zip.ZipInputStream;
  *     <li>コンフィグファイル（JSON）　……　後述するデータを紐づけて管理するための設定ファイル</li>
  *     <li>モデルファイル（MQO）　……　モデリングデータそのもの</li>
  *     <li>テクスチャファイル（PNG、JPG、BMP…）　……　モデリングデータなどに使用するテクスチャファイル。Javaで読み込める者は大抵読み込む。</li>
- *     <li>音声ファイル（WAV、MP3、OGG…）　……　音声として再生できる有効なデータ。MP3推奨。WAVは鳴らせるか微妙。</li>
+ *     <li>音声ファイル（OGG）　……　音声として再生できる有効なデータ。OGGのみ。ちょっとひと工夫必要。</li>
  * </ul>
  * <h2>gts.txtについて</h2>
  * <p>メタ情報を詰め込んだテキストファイル。この名前でないと読み込まない。必ずZIPファイルの直下におくこと。</p>
@@ -47,6 +45,10 @@ import java.util.zip.ZipInputStream;
  *     <li>name: パックの名前。被ってもよいがこの名前が至る所に使われるので被ると利用者が困る。デフォルトはZIPファイル名の拡張子を省いたもの。入れとくべき。</li>
  *     <li>author: パック制作者名。クレジットとして入れておくべき。GUIで出すかどうかは考えていない。</li>
  * </ul>
+ *
+ * <h2>サウンドファイルについて</h2>
+ * <p>サウンドファイルは、一度リソースパックの形にしてから出ないと読み込むことができない。</p>
+ * <p>しかしリソースパックを都度展開するのも地獄なので、各パックごとに動的なリソースパックを用いてそれを読み込むようにする。</p>
  */
 public class GTSPack {
 
@@ -54,6 +56,11 @@ public class GTSPack {
      * サウンドデータをバイト列でそのまま保持する。
      */
     private final HashMap<String, byte[]> sounds = new HashMap<>();
+
+    /**
+     * サウンドデータをもとに登録したサウンドイベントの一覧
+     */
+    private final HashMap<String, SoundEvent> soundEvents = new HashMap<>();
 
     /**
      * テクスチャデータをBufferedImageでラップする。DynamicTextureとして使用するため。
@@ -88,12 +95,12 @@ public class GTSPack {
      * GTS.txtから取得できるパックの名前。存在しない場合はファイル名の拡張子を抜いたもの。
      * NULLになると色々困るため、初期値として「UNKNOWN」を入れておいている。
      */
-    private String name = "UNKNOWN";
+    private String name = DUMMY;
 
     /**
      * GTS.txtから取得できるパックの制作者。存在しない場合はやはりUNKNOWN。
      */
-    private String author = "UNKNOWN";
+    private String author = DUMMY;
 
     /**
      * その他メタ情報。将来的にバージョンが変わればもしかしたら別フィールドとして独立するかもしれないが、
@@ -136,6 +143,11 @@ public class GTSPack {
      */
     public static final String DUMMY_TRAFFIC_ARM = "traffic_arm";
 
+    /**
+     * ダミーモデルの定数（アームモデル）
+     */
+    public static final String DUMMY_TRAFFIC_BUTTON = "traffic_button";
+
     private GTSPack() {
 
     }
@@ -164,6 +176,7 @@ public class GTSPack {
      * ZIPファイルの中身からPackを読み込み、そのPackのインスタンスを返す。
      * 基本的に例外が発生しない限りNULLになることはないが、不正なパックの場合何も登録されていないことがある。
      * その際は、<code>GTSPack.empty()</code>を実行すると判別できる。
+     * 音声ファイルのサウンドイベントの追加はローダーが行うようにしている。
      * @param zis 読み込むZIPファイルのインスタンス
      * @param file 読み込むZIPファイルのファイルオブジェクト。これをそのままパックに登録する。
      * @return 読み込んだPack。
@@ -262,6 +275,7 @@ public class GTSPack {
         }
 
         ProgressManager.pop(bar);
+
         return pack;
     }
 
@@ -288,6 +302,7 @@ public class GTSPack {
             pack.models.put(GTSPack.DUMMY_TRAFFIC_CONTROLLER, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficcontroller.mqo")));
             pack.models.put(GTSPack.DUMMY_TRAFFIC_POLE, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficpole.mqo")));
             pack.models.put(GTSPack.DUMMY_TRAFFIC_ARM, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficarm.mqo")));
+            pack.models.put(GTSPack.DUMMY_TRAFFIC_BUTTON, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficbutton.mqo")));
         } catch (IOException | MQOException e) {
             // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
             throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
@@ -325,6 +340,30 @@ public class GTSPack {
         try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/dummy/trafficarm.png")) {
             if (is == null) throw new IOException();
             pack.textures.put(GTSPack.DUMMY_TRAFFIC_ARM, ImageIO.read(is));
+        } catch (IOException e) {
+            // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
+            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+        }
+        try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/dummy/trafficbutton.png")) {
+            if (is == null) throw new IOException();
+            pack.textures.put(GTSPack.DUMMY_TRAFFIC_BUTTON, ImageIO.read(is));
+        } catch (IOException e) {
+            // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
+            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+        }
+
+        // 音声ファイルを追加（なぜかogg拡張子を必ずつけないとCodec Errorになる）
+        try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/sounds/traffic_button.ogg")) {
+            if (is == null) throw new IOException();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                byte[] data = new byte[4096]; // 4KBずつ読み込み
+                int readByte = 0;
+                while ((readByte = is.read(data, 0, data.length)) != -1) {
+                    baos.write(data, 0, readByte);
+                }
+                pack.sounds.put(GTSPack.DUMMY_TRAFFIC_BUTTON + ".ogg", baos.toByteArray());
+            }
+
         } catch (IOException e) {
             // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
             throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
@@ -372,26 +411,31 @@ public class GTSPack {
 
         // 1. とにかく回す
         try {
-            GTSTrafficArmConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficArmConfig.class);
-            if (config.getBaseObjects().isEmpty()) throw new JsonSyntaxException("");
-            return config;
+            GTSTrafficButtonConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficButtonConfig.class);
+            if (config.getAudios() == null || config.getAudios().getBase() == null) throw new JsonSyntaxException("");
         } catch (JsonSyntaxException e) {
             try {
-                GTSTrafficPoleConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficPoleConfig.class);
-                if (config.getNormalObject() == null) throw new JsonSyntaxException("");
+                GTSTrafficArmConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficArmConfig.class);
+                if (config.getBaseObjects().isEmpty()) throw new JsonSyntaxException("");
                 return config;
             } catch (JsonSyntaxException e2) {
-                // JSONとして不正な場合
                 try {
-                    GTSTrafficLightConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficLightConfig.class);
-                    if (config.getLight() == null) throw new JsonSyntaxException("");
+                    GTSTrafficPoleConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficPoleConfig.class);
+                    if (config.getNormalObject() == null) throw new JsonSyntaxException("");
                     return config;
                 } catch (JsonSyntaxException e3) {
+                    // JSONとして不正な場合
                     try {
-                        return gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficControllerConfig.class);
+                        GTSTrafficLightConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficLightConfig.class);
+                        if (config.getLight() == null) throw new JsonSyntaxException("");
+                        return config;
                     } catch (JsonSyntaxException e4) {
-                        // JSONとして不正な場合
-                        GTS.LOGGER.warn("エラーだ！");
+                        try {
+                            return gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficControllerConfig.class);
+                        } catch (JsonSyntaxException e5) {
+                            // JSONとして不正な場合
+                            GTS.LOGGER.warn("エラーだ！");
+                        }
                     }
                 }
             }
@@ -497,5 +541,9 @@ public class GTSPack {
             return o;
         }
         return m;
+    }
+
+    public HashMap<String, SoundEvent> getSoundEvents() {
+        return soundEvents;
     }
 }

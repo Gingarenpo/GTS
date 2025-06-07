@@ -72,7 +72,7 @@ gts.cycle.fix.arg3=従道歩灯青時間（Tick）
 gts.cycle.fix.arg4=従道歩灯点滅時間（Tick）
 gts.cycle.fix.arg5=車灯黄色時間（Tick）
 gts.cycle.fix.arg6=全赤時間（Tick）
-
+gts.gui.controller.info=%1$dつのサイクルを登録しました
 
 gts.cycle.script.arg1=スクリプトパス
 
@@ -84,4 +84,5 @@ gts.gui.sign.message.apply=正常に情報を更新しました
 gts.gui.sign.message.fail=更新に失敗しました。赤文字を確認してください。
 gts.gui.sign.message.fonts=ログに有効なフォントを書き出しました
 
-gts.gui.controller.info=%1$dつのサイクルを登録しました
+
+tile.traffic_button.name=押ボタン箱

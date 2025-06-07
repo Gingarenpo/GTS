@@ -24,7 +24,7 @@ import java.util.ArrayList;
  *
  * サイクルのデータや、フェーズのデータはシリアライズしてJSON形式の文字列にして渡す想定。
  */
-public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficControllerConfig> implements ITickable, IGTSAttachable<GTSTileEntityTrafficLight> {
+public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficControllerConfig> implements ITickable, IGTSAttachable<GTSTileEntity> {
 
     /**
      * この交通信号制御機にアタッチされたサイクルの一覧。
@@ -45,6 +45,11 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
      * この制御機がアタッチされている交通信号機の一覧。
      */
     private ArrayList<BlockPos> attachedTrafficLights = new ArrayList<>();
+
+    /**
+     * この制御機がアタッチされている交通信号制御機の一覧。
+     */
+    private ArrayList<BlockPos> attachedTrafficButtons = new ArrayList<>();
 
 
     public GTSTileEntityTrafficController() {
@@ -99,7 +104,7 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
         this.detected = compound.getBoolean("gts_detected");
         this.nowCycle = compound.getInteger("gts_nowCycle");
 
-        // アタッチ済みの交通信号機の座標はリスト形式で読み込む
+        // アタッチ済みの座標はリスト形式で読み込む
         ArrayList<BlockPos> pos = new ArrayList<>();
         for (int i = 0; i < compound.getTagList("gts_attached_traffic_light", 10).tagCount(); i++) {
             NBTTagCompound tag =compound.getTagList("gts_attached_traffic_light", 10).getCompoundTagAt(i);
@@ -107,12 +112,20 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
         }
         this.attachedTrafficLights = pos;
 
+        pos = new ArrayList<>();
+        for (int i = 0; i < compound.getTagList("gts_attached_traffic_button", 10).tagCount(); i++) {
+            NBTTagCompound tag =compound.getTagList("gts_attached_traffic_button", 10).getCompoundTagAt(i);
+            pos.add(new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z")));
+        }
+        this.attachedTrafficButtons = pos;
+
         // CyclesはJSONでシリアライズ等を行う
         // ちょっと回りくどいやり方しているけどこうするしかない
         if (compound.hasKey("gts_cycles")) {
             Type listType = new TypeToken<ArrayList<GTSCycle>>() {}.getType();
             this.cycles = GTS.GSON.fromJson(compound.getString("gts_cycles"), listType);
         }
+
 
     }
 
@@ -122,7 +135,7 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
         compound.setBoolean("gts_detected", this.detected);
         compound.setInteger("gts_nowCycle", this.nowCycle);
 
-        // アタッチされた信号機はリストにして格納する
+        // アタッチされた座標はリストにして格納する
         NBTTagList list = new NBTTagList();
         for (BlockPos pos: this.attachedTrafficLights) {
             NBTTagCompound c = new NBTTagCompound();
@@ -132,6 +145,15 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
             list.appendTag(c);
         }
         compound.setTag("gts_attached_traffic_light", list);
+        list = new NBTTagList();
+        for (BlockPos pos: this.attachedTrafficButtons) {
+            NBTTagCompound c = new NBTTagCompound();
+            c.setInteger("x", pos.getX());
+            c.setInteger("y", pos.getY());
+            c.setInteger("z", pos.getZ());
+            list.appendTag(c);
+        }
+        compound.setTag("gts_attached_traffic_button", list);
 
         // Cyclesはそれを全てJSONにして
         Type listType = new TypeToken<ArrayList<GTSCycle>>() {}.getType();
@@ -194,25 +216,44 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
     }
 
     @Override
-    public void attach(GTSTileEntityTrafficLight te) {
+    public void attach(GTSTileEntity te) {
         // ある場合は追加しない
-        if (!this.attachedTrafficLights.contains(te.getPos())) {
-            this.attachedTrafficLights.add(te.getPos());
-            if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficController.class));
-            if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+        if (te instanceof GTSTileEntityTrafficLight) {
+            if (!this.attachedTrafficLights.contains(te.getPos())) {
+                this.attachedTrafficLights.add(te.getPos());
+            }
         }
+        else if (te instanceof GTSTileEntityTrafficButton) {
+            if (!this.attachedTrafficButtons.contains(te.getPos())) {
+                this.attachedTrafficButtons.add(te.getPos());
+                // もし自分自身が検知状態だったら強制的に検知状態にする
+                ((GTSTileEntityTrafficButton) te).setDetected(this.detected);
+            }
+        }
+        this.markDirty();
+        if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficController.class));
+        if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
     }
 
     @Override
-    public void deattach(GTSTileEntityTrafficLight te) {
-        this.attachedTrafficLights.remove(te.getPos()); // ない場合は何もしないようなので安心して消せる
+    public void deattach(GTSTileEntity te) {
+        if (te instanceof GTSTileEntityTrafficLight) {
+            this.attachedTrafficLights.remove(te.getPos()); // ない場合は何もしないようなので安心して消せる
+        }
+        else if (te instanceof GTSTileEntityTrafficButton) {
+            this.attachedTrafficButtons.remove(te.getPos()); // ない場合は何もしないようなので安心して消せる
+        }
+        this.markDirty();
         if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficController.class));
         if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
     }
 
     @Override
     public void reset() {
-        // NOOP
+        this.attachedTrafficLights = new ArrayList<>();
+        this.attachedTrafficButtons = new ArrayList<>();
+        if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficController.class));
+        if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
     }
 
     public ArrayList<BlockPos> getAttachedTrafficLights() {
@@ -221,6 +262,14 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
 
     public void setAttachedTrafficLights(ArrayList<BlockPos> attachedTrafficLights) {
         this.attachedTrafficLights = attachedTrafficLights;
+    }
+
+    public ArrayList<BlockPos> getAttachedTrafficButtons() {
+        return attachedTrafficButtons;
+    }
+
+    public void setAttachedTrafficButtons(ArrayList<BlockPos> attachedTrafficButtons) {
+        this.attachedTrafficButtons = attachedTrafficButtons;
     }
 
     @Override

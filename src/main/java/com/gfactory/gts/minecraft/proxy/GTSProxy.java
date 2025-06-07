@@ -5,10 +5,7 @@ import com.gfactory.gts.common.capability.GTSCapabilities;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketItemNBT;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
-import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
-import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
-import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficPole;
-import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficSign;
+import com.gfactory.gts.minecraft.tileentity.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -27,6 +24,9 @@ import java.io.File;
  */
 public class GTSProxy {
     public void preInit(FMLPreInitializationEvent event) {
+        // パックの検索
+        GTS.LOADER.searchPacks(new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "\\mods\\GTS"));
+
         // テクスチャマネージャーの登録
         GTS.SIGN_MANAGER = GTSSignTextureManager.getInstance();
 
@@ -35,16 +35,17 @@ public class GTSProxy {
         GameRegistry.registerTileEntity(GTSTileEntityTrafficController.class, new ResourceLocation(GTS.MODID, "traffic_controller"));
         GameRegistry.registerTileEntity(GTSTileEntityTrafficPole.class, new ResourceLocation(GTS.MODID, "traffic_pole"));
         GameRegistry.registerTileEntity(GTSTileEntityTrafficSign.class, new ResourceLocation(GTS.MODID, "traffic_sign"));
+        GameRegistry.registerTileEntity(GTSTileEntityTrafficButton.class, new ResourceLocation(GTS.MODID, "traffic_button"));
 
         // Capabilityの登録
         GTSCapabilities.register();
 
     }
 
-    public void init(FMLInitializationEvent event) {}
+    public void init(FMLInitializationEvent event) {
+    }
 
     public void postInit(FMLPostInitializationEvent event) {
-        GTS.LOADER.searchPacks(new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "\\mods\\GTS"));
         // ネットワークの登録
         GTS.NETWORK.registerMessage(new GTSPacketTileEntity(),
                 GTSPacketTileEntity.class,
