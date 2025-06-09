@@ -1,6 +1,8 @@
 # 交通信号制御機
 
-最終更新日時：2025年6月4日
+最終更新日時：2025年6月9日
+
+追加バージョン：2.0 alpha1
 
 交通信号制御機（以下、制御機と記します）は、以下のクラスにより構成されています。
 
@@ -9,7 +11,7 @@
 - `GTSTileEntityRendererTrafficController` → 制御機のレンダラー
 - `GTSTrafficControllerConfig` → 制御機の個別情報（パック）
 
-Version 2.0-alpha2の時点では、制御機のモデル変更には対応していません。
+~~Version 2.0-alpha2の時点では、制御機のモデル変更には対応していません。~~ Version 2.0-alpha3より対応しました。
 
 ## パックJSON（コンフィグ）の仕様
 
