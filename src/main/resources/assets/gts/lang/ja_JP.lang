@@ -1,0 +1,88 @@
+
+gts.message.pack_search.dummy=ダミーパックをロードしました
+# メッセージ関連（ログ含む）
+gts.message.pack_search.start=「%1$s」から拡張パックの検索を開始
+gts.message.pack_search.zip_count=%1$dつのZIPファイルを発見
+gts.message.pack_search.notfound=拡張パックは検出されませんでした。
+gts.message.pack_search.zip_progress1=GTS拡張パックを検索しています…
+gts.message.pack_search.finish=GTS拡張パックの検索が完了しました。%1$d個のパックを読み込みました。
+gts.message.pack_search.error.zip=%1$sを開けません。本当にGTSの拡張パックですか？
+gts.message.pack_search.error.empty=%1$sから内容を読み取れません。壊れているか不正な可能性があります。
+gts.message.pack_load.start=%1$sを読み込み中……
+gts.message.find.class=具象クラス「%1$s」を発見しました。
+
+gts.warning.nbt_cannot_load=NBT警告: 「%1$s」である「%2$s」の読み込みに失敗しました。ダミーモデルに置き換えます。
+gts.warning.texture_cannot_load=テクスチャ警告: 「%1$s」の読み込みに失敗したため、このテクスチャを含むモデルはレンダリングされません。
+gts.warning.model_cannot_load=モデル警告: 「%1$s」の読み込みに失敗したため、このモデルはレンダリングされません。
+
+gts.message.chat.selected=%1$sが選択されました
+gts.message.chat.deselected=%1$sの選択を解除しました
+gts.message.chat.attached=%2$sに%1$sをアタッチしました
+gts.message.chat.deattached=%2$sから%1$sをアタッチ解除しました
+gts.message.chat.selection_override=警告: 以前の選択内容は上書きされます！
+
+gts.exception.argument=一つ以上のパラメーターがNULLになっています。
+gts.exception.pack_load.io=「%1$s」を読み込めませんでした。理由: &2$s
+gts.exception.pack_load.texture=%1$sはテクスチャとして認識されましたが、その読み込みに失敗しました。
+gts.exception.pack_load.model=%1$sはモデルとして認識されましたが、その読み込みに失敗しました。
+gts.exception.packet=パケットが壊れています！
+gts.exception.script_engine=スクリプトエンジンの起動に失敗しました。
+gts.exception.script_engine.notfound=「%1$s」は存在しません。
+gts.exception.script_engine.eval=スクリプトの実行に失敗しました -> %1$s
+gts.exception.script_engine.io=スクリプトファイルの読み込みに失敗しました。
+gts.exception.texture.create=テクスチャの作成に失敗しました -> %1$s
+
+tile.traffic_light.name=交通信号機
+tile.traffic_controller.name=交通信号制御機
+tile.traffic_pole.name=交通信号柱
+tile.traffic_sign.name=地名板
+itemGroup.gts_tab=GTS - Ginren Traffic System
+item.gts.attachment.name=GTSアタッチメント
+item.gts.traffic_arm.name=アーム
+
+gts.gui.model_choose=モデルを確定
+gts.gui.model.none=モデルが見つかりません
+gts.gui.channel.name=チャンネル名
+gts.gui.channel.apply=チャンネル名を確定
+gts.gui.position.apply=モデル描画位置を確定
+gts.gui.position.x=座標X
+gts.gui.position.y=座標Y
+gts.gui.position.z=座標Z
+gts.gui.controller.load=サイクルをロード
+gts.gui.controller.save=サイクルをセーブ
+gts.gui.controller.load.done=サイクル情報をロードしました
+gts.gui.controller.load.error=サイクル情報のロードに失敗しました -> %1$s.
+gts.gui.controller.save.done=サイクル情報をセーブしました
+gts.gui.controller.save.error=サイクル情報のセーブに失敗しました -> %1$s.
+gts.gui.controller.extension=制御機サイクル情報
+gts.gui.controller.chooser.title=制御機情報のロード・セーブ
+gts.gui.sign.japanese=日本語部分
+gts.gui.sign.english=英語部分
+gts.gui.sign.color.fore=文字色
+gts.gui.sign.color.back=背景色
+gts.gui.sign.fixed=幅固定地名板？
+gts.gui.sign.width=地名板の幅
+gts.gui.sign.height=地名板の高さ
+gts.gui.sign.depth=地名板の厚み
+gts.gui.sign.apply=各情報を適用
+
+gts.cycle.fix.arg1=主道歩灯青時間（Tick）
+gts.cycle.fix.arg2=主道歩灯点滅時間（Tick）
+gts.cycle.fix.arg3=従道歩灯青時間（Tick）
+gts.cycle.fix.arg4=従道歩灯点滅時間（Tick）
+gts.cycle.fix.arg5=車灯黄色時間（Tick）
+gts.cycle.fix.arg6=全赤時間（Tick）
+gts.gui.controller.info=%1$dつのサイクルを登録しました
+
+gts.cycle.script.arg1=スクリプトパス
+
+gts.gui.sign.japanese.font=日本語用フォント
+gts.gui.sign.english.font=英語用フォント
+gts.gui.sign.font.available=有効なフォントは以下の文字列です：
+gts.gui.sign.check.font.available=有効なフォント名一覧をログに出力
+gts.gui.sign.message.apply=正常に情報を更新しました
+gts.gui.sign.message.fail=更新に失敗しました。赤文字を確認してください。
+gts.gui.sign.message.fonts=ログに有効なフォントを書き出しました
+
+
+tile.traffic_button.name=押ボタン箱

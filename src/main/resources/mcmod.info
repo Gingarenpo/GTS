@@ -1,18 +1,16 @@
 [
   {
+
+    "modinfoversion": 2,
     "modid": "gts",
-    "name": "GTS - Ginren Traffic System Mod",
-    "description": "",
-    "version": "${version}",
-    "mcversion": "${mcversion}",
-    "url": "https://ginren.info/GFactory",
-    "updateUrl": "",
-    "authorList": [
-      "Gingarenpo"
-    ],
-    "credits": "",
-    "logoFile": "",
-    "screenshots": [],
-    "dependencies": []
+    "name": "GTS - Ginren Traffic System",
+    "description": "Provide real traffic system to your world",
+    "version": "2.0-alpha2",
+    "mcversion": "1.12.2",
+    "url": "https://ginren.info/G-Factory/",
+    "authorList": ["Gingarenpo"],
+    "credits": "Powered by G-Factory",
+    "requiredMods": ["forge"],
+    "useDependencyInformation": true
   }
 ]

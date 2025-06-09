@@ -1,0 +1,113 @@
+buildscript {
+    repositories {
+        maven { url = "https://files.minecraftforge.net/maven" }
+        maven { url = 'https://maven.minecraftforge.net/' }
+        maven { url = "https://plugins.gradle.org/m2/" }
+        mavenCentral()
+    }
+    dependencies {
+        classpath 'net.minecraftforge.gradle:ForgeGradle:2.3-SNAPSHOT'
+        classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
+    }
+}
+
+apply plugin: 'net.minecraftforge.gradle.forge'
+apply plugin: 'maven'
+apply plugin: 'com.github.johnrengelman.shadow'
+
+static def getTimestamp() {
+    return new Date().format("yyyyMMdd")
+}
+
+version = '2.0' + "-" + getTimestamp()
+group = 'com.g-factory.gts'
+archivesBaseName = 'GTS'
+
+sourceCompatibility = targetCompatibility = '1.8'
+
+minecraft {
+    version = "1.12.2-14.23.5.2821"  // ✅ 安定版
+    runDir = "run"
+    mappings = "snapshot_20171003"
+}
+
+dependencies {
+    compile 'io.github.classgraph:classgraph:4.8.104'
+}
+
+jar {
+    manifest {
+        attributes([
+                "Specification-Title": "GTS",
+                "Specification-Vendor": "g-factory",
+                "Specification-Version": "1",
+                "Implementation-Title": project.name,
+                "Implementation-Version": version,
+                "Implementation-Vendor" :"g-factory",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ"),
+                // ダブルクリック実行時はPackMakerを起動する
+                "Main-Class": "com.gfactory.gts.tool.GTSPackMaker",
+        ])
+    }
+}
+
+shadowJar {
+    classifier ""
+    manifest {
+        attributes([
+                "Specification-Title": "GTS",
+                "Specification-Vendor": "g-factory",
+                "Specification-Version": "1",
+                "Implementation-Title": project.name,
+                "Implementation-Version": version,
+                "Implementation-Vendor" :"g-factory",
+                "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
+
+shadowJar.finalizedBy('reobfJar')
+
+uploadArchives {
+    repositories {
+        mavenDeployer {
+            repository(url: "file:///${project.projectDir}/mcmodsrepo")
+            pom.version = version
+            pom.artifactId = archivesBaseName
+            pom.groupId = group
+        }
+    }
+}
+
+/*
+	MQOクラスのテストクラスを起動させるためのもの
+*/
+tasks.register('runTmp', JavaExec) {
+    group = "application"
+    description = "Run test class for mqo"
+    main = "com.gfactory.core.mqo.Tmp"
+    classpath = sourceSets.main.output + configurations.runtimeClasspath
+}
+
+/*
+	開発環境において、アドオンを作成する系のプログラムを起動するためのもの
+*/
+tasks.register("runPackMaker", JavaExec) {
+	group = "application"
+	description = "Run pack maker"
+	main = "com.gfactory.gts.tool.GTSPackMaker"
+	classpath = sourceSets.main.output + configurations.runtimeClasspath
+}
+
+/*
+	開発環境において、地名板の生成テストを行うもの
+*/
+tasks.register("runSignGenerator", JavaExec) {
+    group = "application"
+    description = "Run pack maker"
+    main = "com.gfactory.gts.common.GTSSignTextureManager"
+    classpath = sourceSets.main.output + configurations.runtimeClasspath + project.tasks.named("runClient").get().classpath
+}
+
+
+build.dependsOn shadowJar
