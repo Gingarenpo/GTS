@@ -54,6 +54,9 @@ public class GTSMenuBar extends JMenuBar {
 		this.menuExportPack.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
 		this.menuExportPack.setToolTipText(I18n.format("menu.tooltip.exportPack"));
 		menuFile.add(menuExportPack);
+		
+		// 有効か無効かを切り替え
+		this.menuExportPack.setEnabled(false);
 	}
 
 }

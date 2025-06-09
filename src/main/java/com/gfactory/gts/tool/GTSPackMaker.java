@@ -1,15 +1,18 @@
 package com.gfactory.gts.tool;
 
 import java.awt.BorderLayout;
-import java.awt.Color;
+import java.awt.Dimension;
 
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
 
+import com.gfactory.gts.tool.component.GTSMainTabPane;
 import com.gfactory.gts.tool.component.GTSMenuBar;
+import com.gfactory.gts.tool.component.GTSSideTreeView;
 import com.gfactory.gts.tool.helper.I18n;
 import com.gfactory.gts.tool.project.GTSPackProject;
 
@@ -32,12 +35,27 @@ public class GTSPackMaker {
 	/**
 	 * バージョン
 	 */
-	public static final String VERSION = "0.1b - GTS2";
+	public static final String VERSION = "0.1b - GTS2.0";
 	
 	/**
 	 * ステータスバー
 	 */
-	public static JLabel statusBar = new JLabel(I18n.format("status.noProjectOpen"));
+	public static JLabel statusBar;
+	
+	/**
+	 * サイドバー
+	 */
+	public static GTSSideTreeView sideView;
+	
+	/**
+	 * メインエディタのタブパネル
+	 */
+	public static GTSMainTabPane mainView;
+	
+	/**
+	 * 各種設定項目を保存しておくところ
+	 */
+	public static GTSPackMakerConfig config = new GTSPackMakerConfig();
 
 	/**
 	 * 現在開いているプロジェクトのディレクトリ位置
@@ -53,10 +71,12 @@ public class GTSPackMaker {
 		try {
 			// Windowsライクな見た目にトライ
 			UIManager.setLookAndFeel("com.sun.java.swing.plaf.windows.WindowsLookAndFeel");
+			SwingUtilities.updateComponentTreeUI(window);
 		} catch (Exception e) {
 			try {
 				// Linuxライクな見た目にトライ
 				UIManager.setLookAndFeel("com.sun.java.swing.plaf.gtk.GTKLookAndFeel");
+				SwingUtilities.updateComponentTreeUI(window);
 			} catch (Exception e2) {
 				e2.printStackTrace();
 				// 仕方ないのでMetalで
@@ -65,20 +85,53 @@ public class GTSPackMaker {
 		
 		// ウィンドウ初期設定
 		window.setTitle(I18n.format("core.title", VERSION));
-		window.setSize(1280, 720);
+		window.setSize(config.getWindowSize());
 		window.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		window.setLocationRelativeTo(null);
+		
 		
 		// メニューバー設定
 		window.setJMenuBar(new GTSMenuBar(window));
 		window.setVisible(true);
 		
 		// ステータスバー設定
+		statusBar = new JLabel(I18n.format("status.noProjectOpen"));
+		statusBar.setHorizontalTextPosition(JLabel.LEFT);
 		JPanel statusPanel = new JPanel();
-		statusPanel.setBackground(new Color(224, 224, 224));
 		statusPanel.setBorder(new EtchedBorder());
 		statusPanel.add(statusBar);
 		window.getContentPane().add(statusPanel, BorderLayout.SOUTH);
+		
+		// サイドバー設定
+		sideView = new GTSSideTreeView();
+		window.getContentPane().add(sideView, BorderLayout.WEST);
+		
+		// タブバー設定
+		mainView = new GTSMainTabPane();
+		window.getContentPane().add(mainView, BorderLayout.CENTER);
+	
+	}
+	
+	/**
+	 * PackMakerの設定ファイルをJSON形式で読み書きするためのもの
+	 * デフォルトのパスはGTSディレクトリがあればそこの中、無ければ直下
+	 */
+	public static class GTSPackMakerConfig {
+		
+		private int[] size = new int[] {1280, 720};
+		
+		public GTSPackMakerConfig() {
+			// ダミーコンフィグを設定
+		}
+		
+	
+		/**
+		 * ウィンドウサイズを返す
+		 * @return
+		 */
+		public Dimension getWindowSize() {
+			return new Dimension(size[0], size[1]);
+		}
 	}
 
 }
