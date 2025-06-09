@@ -5,7 +5,9 @@ import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
+import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSConfig;
+import com.gfactory.gts.pack.config.GTSTrafficControllerConfig;
 import com.google.gson.JsonParseException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiButton;
@@ -20,6 +22,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Map;
 import java.util.TreeMap;
 
 /**
@@ -42,7 +45,15 @@ public class GTSGuiTrafficController extends GTSGuiModelChoose<GTSTileEntityTraf
 
     @Override
     public TreeMap<String, ? extends GTSConfig> getModelElements() {
-        return new TreeMap<>();
+        TreeMap<String, GTSTrafficControllerConfig> elements = new TreeMap<>();
+        for (GTSPack p: GTS.LOADER.getPacks()) {
+            for (Map.Entry<String, GTSConfig<GTSConfig.GTSTexture>> e: p.getConfigs().entrySet()) {
+                if (!(e.getValue() instanceof GTSTrafficControllerConfig)) continue;
+                GTSTrafficControllerConfig c = (GTSTrafficControllerConfig) e.getValue();
+                elements.put(p.getName() + ": " + c.getId(), c);
+            }
+        }
+        return elements;
     }
 
     @Override

@@ -127,18 +127,10 @@ public class GTSSignTextureManager {
             }
         }
 
-        // 生成中ならばnullを返す
-        if (pendingTasks.containsKey(info)) return null;
-
-        this.createThread(info, false);
+        if (!pendingTasks.containsKey(info)) this.createThread(info, false);
 
         // 一応デフォルトを探し、あればそれを返す
-        synchronized (this.sign114) {
-            if (PLACE_HOLDER != null) {
-                return PLACE_HOLDER;
-            }
-            return null;
-        }
+        return PLACE_HOLDER;
     }
 
     /**

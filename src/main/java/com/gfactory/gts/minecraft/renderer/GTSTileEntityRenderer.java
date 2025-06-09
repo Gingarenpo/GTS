@@ -52,7 +52,6 @@ public abstract class GTSTileEntityRenderer<T extends GTSTileEntity, U extends G
 
         // OpenGL設定
         GlStateManager.enableRescaleNormal();
-        GL11.glEnable(GL11.GL_NORMALIZE);
         GlStateManager.enableLighting();
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 

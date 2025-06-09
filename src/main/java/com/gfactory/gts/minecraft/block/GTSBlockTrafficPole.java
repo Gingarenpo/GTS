@@ -74,7 +74,7 @@ public class GTSBlockTrafficPole extends GTSBlock<GTSTileEntityTrafficPole> {
         // GUIを出す
         Minecraft.getMinecraft().displayGuiScreen(new GTSGuiTrafficPole((GTSTileEntityTrafficPole) te));
 
-        return true;
+        return false;
     }
 
     @Override

@@ -1,6 +1,5 @@
 package com.gfactory.gts.pack;
 
-import com.gfactory.gts.minecraft.GTS;
 import net.minecraft.client.resources.IResourcePack;
 import net.minecraft.client.resources.data.IMetadataSection;
 import net.minecraft.client.resources.data.MetadataSerializer;
@@ -48,14 +47,14 @@ public class GTSMemoryResourcePack implements IResourcePack {
         StringBuilder sb = new StringBuilder();
         sb.append("{"); // JSONの始まりを示す物を追加
         for (String path: this.pack.getSounds().keySet()) {
-            // これをキーとして登録
-            sb.append("\"").append(this.getPackName()).append(":").append(path).append("\": {");
+            // これをキーとして登録（パック名がどうやら小文字じゃないとだめらしい）
+            sb.append("\"").append(this.getPackName().toLowerCase()).append(":").append(path.replace(".ogg", "")).append("\": {");
             // カテゴリ
             sb.append("\"category\": \"block\",");
             // sounds配列を開始
             sb.append("\"sounds\": [{");
             // サウンドの名前を入れる
-            sb.append("\"name\": \"").append(this.getPackName()).append(":").append(path).append("\",");
+            sb.append("\"name\": \"").append(this.getPackName().toLowerCase()).append(":").append(path.replace(".ogg", "")).append("\",");
             // サウンドのタイプを入れる
             // sb.append("\"type\": \"file\",");
             // サウンドの確率らしいがまあ適当に
@@ -109,8 +108,7 @@ public class GTSMemoryResourcePack implements IResourcePack {
      */
     @Override
     public boolean resourceExists(ResourceLocation location) {
-        GTS.LOGGER.error(location);
-        if (!location.getResourceDomain().equals(this.getPackName())) {
+        if (!location.getResourceDomain().equals(this.getPackName().toLowerCase())) {
             return false;
         }
         if (location.getResourcePath().equals("sounds/sounds.json")) {
@@ -125,7 +123,7 @@ public class GTSMemoryResourcePack implements IResourcePack {
      */
     @Override
     public Set<String> getResourceDomains() {
-        return Collections.singleton("gts_" + this.pack.getName());
+        return Collections.singleton("gts_" + this.pack.getName().toLowerCase());
     }
 
     /**

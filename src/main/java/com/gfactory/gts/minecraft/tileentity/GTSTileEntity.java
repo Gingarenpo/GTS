@@ -293,4 +293,13 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
         if (this.modelMinMax == null) this.calcModelMinMax();
         return this.modelMinMax;
     }
+
+    /**
+     * レンダリング可能範囲を強制的に広げる（そうしないと途中で消える）
+     * @return
+     */
+    @Override
+    public double getMaxRenderDistanceSquared() {
+        return Math.pow(128, 2);
+    }
 }

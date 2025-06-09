@@ -126,6 +126,8 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
 
     public void setAttachedTrafficController(BlockPos attachedTrafficController) {
         this.attachedTrafficController = attachedTrafficController;
+        if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficButton.class));
+        if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 15);
     }
 
     public boolean isDetected() {
@@ -136,6 +138,8 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
         if (detected && !this.detected) this.nowTick = 0; // 検知を初めて行った際は初期化
         this.detected = detected;
         this.sendDetected();
+        if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficButton.class));
+        if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 15);
 
     }
 
@@ -145,6 +149,8 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
 
     public void setMaxWaitTick(int maxWaitTick) {
         this.maxWaitTick = maxWaitTick;
+        if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficButton.class));
+        if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 15);
     }
 
     /**

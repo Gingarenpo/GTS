@@ -75,16 +75,6 @@ public class GTS {
 
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) throws InterruptedException {
-        proxy.preInit(event);
-    }
-
-    @Mod.EventHandler
-    public void init(FMLInitializationEvent event) {
-        proxy.init(event);
-    }
-
-    @Mod.EventHandler
-    public void postInit(FMLPostInitializationEvent event) {
         // GTSCycleクラスをスキャンして登録する
         RuntimeTypeAdapterFactory<GTSCycle> typeFactory = RuntimeTypeAdapterFactory.of(GTSCycle.class, "type");
         for (Class<? extends GTSCycle> clazz: GTSClassScanner.findCycleClass()) {
@@ -103,7 +93,7 @@ public class GTS {
         RuntimeTypeAdapterFactory<GTSConfig> typeFactory3 = RuntimeTypeAdapterFactory.of(GTSConfig.class, "type");
         for (Class<? extends GTSConfig> clazz: GTSClassScanner.findConfigClass()) {
             GTS.LOGGER.debug(I18n.format("gts.message.find.class", clazz.getName()));
-            typeFactory3.registerSubtype(clazz);
+            typeFactory3.registerSubtype(clazz, clazz.getSimpleName().toLowerCase().replace("gts", "").replace("config", "").replace("traffic", ""));
         }
 
         // ここでやっとGSONを読み込めるがまあゲーム開始時以降しか使わないはずだから平気。
@@ -114,6 +104,17 @@ public class GTS {
                 .registerTypeAdapterFactory(typeFactory3)
                 .setPrettyPrinting()
                 .create();
+        proxy.preInit(event);
+    }
+
+    @Mod.EventHandler
+    public void init(FMLInitializationEvent event) {
+        proxy.init(event);
+    }
+
+    @Mod.EventHandler
+    public void postInit(FMLPostInitializationEvent event) {
+
 
         proxy.postInit(event);
     }

@@ -6,6 +6,7 @@ import com.gfactory.core.mqo.MQOLoader;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.config.*;
 import com.google.gson.Gson;
+import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.DynamicTexture;
@@ -399,13 +400,33 @@ public class GTSPack {
     }
 
     /**
+     * 指定したデータのバイト列を読み込み、JSONとして読み込む。
+     * GTS2.0準拠で、「type」という項目が新設されその中身をもとに読み込まれる。
+     * 無効なJSONの場合はNULLを返す。1.0との互換性がなくなるので注意。
+     * @param data データ
+     * @return 読み込んだコンフィグ
+     */
+    private static GTSConfig readConfig(byte[] data) {
+        try {
+            return GTS.GSON.fromJson(new String(data, StandardCharsets.UTF_8), GTSConfig.class);
+        } catch (JsonParseException e) {
+            GTS.LOGGER.error(I18n.format("gts.exception.pack_load.config", e.getLocalizedMessage()));
+            return null;
+        }
+    }
+
+    /**
      * 指定したZIPファイルのエントリのバイト列を利用して、その中身をもとにJSON読み込みを試す。
      * 存在する全クラスを試すが、今はここを手打ちしている。どうにかしたい。
      * GTSConfigを返すが、無効なJSONの場合はNULLを投げるので注意。
      *
+     * 1.0との互換性を守るために頑張ってきたが無理なのでold扱い。
+     * 一応残しておくけど
+     *
      * @param data readData等を使用して読み込んだバイト列
      */
-    private static GTSConfig readConfig(byte[] data) {
+    @Deprecated
+    private static GTSConfig readConfigOld(byte[] data) {
         // 0. GSONインスタンスを作成し、コンフィグの読み込みを準備する
         Gson gson = new Gson();
 

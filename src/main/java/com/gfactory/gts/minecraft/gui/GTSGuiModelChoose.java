@@ -40,7 +40,6 @@ public abstract class GTSGuiModelChoose<T extends GTSTileEntity> extends GTSGui 
                 this.width / 4 + MARGIN * 3 + 20,
                 elements
                 ));
-        GTS.LOGGER.info(this.widgets.get(1));
 
         // モデルを変更するボタンを追加
         GuiButton b = new GuiButton(10001, this.width / 8, this.width / 4 + MARGIN * 2, I18n.format("gts.gui.model_choose"));

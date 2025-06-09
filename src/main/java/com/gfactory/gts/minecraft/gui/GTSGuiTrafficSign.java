@@ -306,7 +306,7 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
 
             // 地名板の情報を適用
             if (this.tileEntity.is114Sign()) {
-                GTSSignTextureManager.GTS114Sign info = this.tileEntity.getInfo();
+                GTSSignTextureManager.GTS114Sign info = new GTSSignTextureManager.GTS114Sign();
                 try {
                     int c1 = Integer.parseInt(this.foreGroundColor.getText().toUpperCase(), 16);
                     info.textColor = new Color(c1);
@@ -349,7 +349,8 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
 
                 info.aspect = this.tileEntity.getWidth() / this.tileEntity.getHeight();
 
-                tileEntity.setTexture(null);
+                this.tileEntity.setInfo(info);
+                tileEntity.setTexture(GTSSignTextureManager.PLACE_HOLDER);
 
                 this.message = I18n.format("gts.gui.sign.message.apply");
 

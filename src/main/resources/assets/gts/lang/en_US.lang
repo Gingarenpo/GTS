@@ -36,6 +36,7 @@ gts.exception.script_engine.notfound=File '%1$s' is not found.
 gts.exception.script_engine.eval=Cannot run script -> %1$s
 gts.exception.script_engine.io=Cannot read script file
 gts.exception.texture.create=Cannot create texture -> %1$s
+gts.exception.pack_load.config=Cannot load config! -> %1$s
 
 # マイクラワールド内翻訳関連
 tile.traffic_light.name=Trafic Light
