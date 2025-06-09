@@ -4,7 +4,9 @@ import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.util.math.Vec3d;
 import org.lwjgl.BufferUtils;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.opengl.GL15;
+import org.lwjgl.opengl.GL20;
 
 import java.nio.FloatBuffer;
 import java.nio.IntBuffer;
@@ -192,48 +194,62 @@ public final class MQOObject {
      * Minecraftの仕様に忠実なのでLWJGL使う。
      */
     public void draw() {
-        if (this.vboData == null) this.buildVBO();
-        if (!this.vboData.isGPULoaded()) this.vboData.loadGPU();
+        if (this.vboData == null) {
+            this.buildVBO();
+            return;
+        }
+        if (!this.vboData.isGPULoaded()) {
+            this.vboData.loadGPU();
+            return;
+        }
 
-        // 法線の自動ノーマライズ有効化
+        // 現在のバッファを保存
+        int prevVBO = GL11.glGetInteger(GL15.GL_ARRAY_BUFFER_BINDING);
+
+        // 法線の自動ノーマライズ有効化（これは固定機能なのでoptional）
         GL11.glEnable(GL11.GL_NORMALIZE);
+        GL13.glActiveTexture(GL13.GL_TEXTURE0);
 
-        // VBOバッファ（頂点、面）をバインド（テクスチャは既にバインド済みとする）
+        // VBOバインド
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vboData.getVid());
 
-        // 頂点、UV、法線ベクトルをポインタで指定
-        GlStateManager.glEnableClientState(GL11.GL_VERTEX_ARRAY);
+        // 頂点属性の有効化
+        GL20.glEnableVertexAttribArray(0); // 位置
+        GL20.glEnableVertexAttribArray(1); // UV
+        if (this.vboData.isUseNormal()) {
+            GL20.glEnableVertexAttribArray(2); // 法線
+        } else {
+            GL20.glEnableVertexAttribArray(3); // 色
+        }
+
+        // 頂点属性ポインタの設定
+        GL20.glVertexAttribPointer(0, 3, GL11.GL_FLOAT, false, 8 * Float.BYTES, 0L);
+        GL20.glVertexAttribPointer(1, 2, GL11.GL_FLOAT, false, 8 * Float.BYTES, 3 * Float.BYTES);
+        GL11.glTexCoordPointer(2, GL11.GL_FLOAT, 8 * Float.BYTES, 3 * Float.BYTES);
         GlStateManager.glEnableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
         if (this.vboData.isUseNormal()) {
-            GlStateManager.glEnableClientState(GL11.GL_NORMAL_ARRAY);
-        }
-        else {
-            GlStateManager.glEnableClientState(GL11.GL_COLOR_ARRAY);
-        }
-        GlStateManager.glVertexPointer(3, GL11.GL_FLOAT, 8 * Float.BYTES, 0);
-        GlStateManager.glTexCoordPointer(2, GL11.GL_FLOAT, 8 * Float.BYTES, 3 * Float.BYTES);
-        if (this.vboData.isUseNormal()) {
-            GL11.glNormalPointer(GL11.GL_FLOAT, 8 * Float.BYTES, 5 * 4L);
-        }
-        else {
-            GlStateManager.glColorPointer(3, GL11.GL_FLOAT, 8 * Float.BYTES, 5 * Float.BYTES);
+            GL20.glVertexAttribPointer(2, 3, GL11.GL_FLOAT, false, 8 * Float.BYTES, 5 * Float.BYTES);
+        } else {
+            GL20.glVertexAttribPointer(3, 3, GL11.GL_FLOAT, false, 8 * Float.BYTES, 5 * Float.BYTES);
         }
 
         // 描画
         GL11.glDrawArrays(GL11.GL_TRIANGLES, 0, this.vboData.getVertexVBO().capacity() / 8);
 
-        // バッファの解除
-        GlStateManager.glDisableClientState(GL11.GL_VERTEX_ARRAY);
-        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+        // 頂点属性の無効化
+        GL20.glDisableVertexAttribArray(0);
+        GL20.glDisableVertexAttribArray(1);
         if (this.vboData.isUseNormal()) {
-            GlStateManager.glDisableClientState(GL11.GL_NORMAL_ARRAY);
+            GL20.glDisableVertexAttribArray(2);
+        } else {
+            GL20.glDisableVertexAttribArray(3);
         }
-        else {
-            GlStateManager.glDisableClientState(GL11.GL_COLOR_ARRAY);
-        }
-        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
-        GL15.glBindBuffer(GL15.GL_ELEMENT_ARRAY_BUFFER, 0);
+        GlStateManager.glDisableClientState(GL11.GL_TEXTURE_COORD_ARRAY);
+
+        // VBOバインド解除
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, prevVBO);
     }
+
 
     /**
      * 現在の頂点、面の情報を利用して、法線情報を計算する。

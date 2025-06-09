@@ -30,7 +30,7 @@ public class MQOVBOData {
     /**
      * 法線を使うかどうか。678の要素の意味が変わる
      */
-    private boolean useNormal = false;
+    private boolean useNormal = true;
 
 
     /**
@@ -75,6 +75,7 @@ public class MQOVBOData {
         this.vid = GL15.glGenBuffers();
         GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, this.vid);
         GL15.glBufferData(GL15.GL_ARRAY_BUFFER, this.vertexVBO, GL15.GL_STATIC_DRAW);
+        GL15.glBindBuffer(GL15.GL_ARRAY_BUFFER, 0);
 
     }
 
