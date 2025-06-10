@@ -16,10 +16,7 @@ import net.minecraft.nbt.NBTTagCompound;
 
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
@@ -62,47 +59,70 @@ public class GTSGuiTrafficController extends GTSGuiModelChoose<GTSTileEntityTraf
         if (button.id == 1) {
             // サイクルをロードする
             // 流石にMinecraftのGUIだけでは限界があるのでSwingを使う
-            JFileChooser fc = new JFileChooser(Minecraft.getMinecraft().mcDataDir);
-            fc.addChoosableFileFilter(new FileNameExtensionFilter(I18n.format("gts.gui.controller.extension"), "gts"));
-            int result = fc.showDialog(null, I18n.format("gts.gui.controller.load")); // Minecraftフリーズするけど仕方ない
-            if (result != JFileChooser.APPROVE_OPTION) return; // キャンセルされた場合などは実行しない
+            // その際ウィンドウが隠れるのでダミーJFrame作って最前面にする
+            SwingUtilities.invokeLater(() -> {
+                JFrame dummyFrame = new JFrame();
+                dummyFrame.setAlwaysOnTop(true);
+                dummyFrame.setUndecorated(true);
+                dummyFrame.setLocationRelativeTo(null);
+                dummyFrame.setVisible(true);
+                JFileChooser fc = new JFileChooser(Minecraft.getMinecraft().mcDataDir);
+                fc.addChoosableFileFilter(new FileNameExtensionFilter(I18n.format("gts.gui.controller.extension"), "gts"));
+                int result = fc.showDialog(dummyFrame, I18n.format("gts.gui.controller.load")); // Minecraftフリーズするけど仕方ない
+                if (result != JFileChooser.APPROVE_OPTION) {
+                    dummyFrame.dispose();
+                    return;
+                }; // キャンセルされた場合などは実行しない
 
-            // サイクルのロードを行う
-            File file = fc.getSelectedFile();
-            if (file == null) return;
-            try (FileReader fr = new FileReader(file)) {
-                //
-                GTSCycle[] cycle = GTS.GSON.fromJson(fr, GTSCycle[].class); // サイクル情報を読み込みパース
-                GTSTileEntityTrafficController te = (GTSTileEntityTrafficController) tileEntity;
-                te.setCycles(new ArrayList<>(Arrays.asList(cycle)));
-                te.markDirty();
-                GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(te.writeToNBT(new NBTTagCompound()), te.getPos(), GTSTileEntityTrafficController.class));
-                this.errorMessage = I18n.format("gts.gui.controller.load.done");
-            } catch (JsonParseException e) {
-                this.errorMessage = I18n.format("gts.gui.controller.load.error", e.getLocalizedMessage());
-            }
+                // サイクルのロードを行う
+                File file = fc.getSelectedFile();
+                dummyFrame.dispose(); // ウィンドウ閉じる
+                if (file == null) return;
+                try (FileReader fr = new FileReader(file)) {
+                    //
+                    GTSCycle[] cycle = GTS.GSON.fromJson(fr, GTSCycle[].class); // サイクル情報を読み込みパース
+                    GTSTileEntityTrafficController te = (GTSTileEntityTrafficController) tileEntity;
+                    te.setCycles(new ArrayList<>(Arrays.asList(cycle)));
+                    te.markDirty();
+                    GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(te.writeToNBT(new NBTTagCompound()), te.getPos(), GTSTileEntityTrafficController.class));
+                    this.errorMessage = I18n.format("gts.gui.controller.load.done");
+                } catch (JsonParseException | IOException e) {
+                    this.errorMessage = I18n.format("gts.gui.controller.load.error", e.getLocalizedMessage());
+                }
+            });
         }
         else if (button.id == 2) {
             // セーブする
             // 流石にMinecraftのGUIだけでは限界があるのでSwingを使う
-            JFileChooser fc = new JFileChooser(Minecraft.getMinecraft().mcDataDir);
-            fc.addChoosableFileFilter(new FileNameExtensionFilter(I18n.format("gts.gui.controller.extension"), "gts"));
-            int result = fc.showDialog(null, I18n.format("gts.gui.controller.save")); // Minecraftフリーズするけど仕方ない
-            if (result != JFileChooser.APPROVE_OPTION) return; // キャンセルされた場合などは実行しない
+            JFrame dummyFrame = new JFrame();
+            dummyFrame.setAlwaysOnTop(true);
+            dummyFrame.setUndecorated(true);
+            dummyFrame.setLocationRelativeTo(null);
+            dummyFrame.setVisible(true);
+            SwingUtilities.invokeLater(() -> {
+                JFileChooser fc = new JFileChooser(Minecraft.getMinecraft().mcDataDir);
+                fc.addChoosableFileFilter(new FileNameExtensionFilter(I18n.format("gts.gui.controller.extension"), "gts"));
+                int result = fc.showDialog(dummyFrame, I18n.format("gts.gui.controller.save")); // Minecraftフリーズするけど仕方ない
+                if (result != JFileChooser.APPROVE_OPTION) {
+                    dummyFrame.dispose();
+                    return;
+                }; // キャンセルされた場合などは実行しない
 
-            // サイクルのロードを行う
-            File file = fc.getSelectedFile();
-            if (file == null) return;
-            try (FileWriter fw = new FileWriter(file)) {
+                // サイクルのロードを行う
+                File file = fc.getSelectedFile();
 
-                GTSTileEntityTrafficController te = (GTSTileEntityTrafficController) tileEntity;
-                String data = GTS.GSON.toJson(te.getCycles().toArray(), GTSCycle[].class); // サイクル情報を読み込みパース
-                fw.write(data);
+                if (file == null) return;
+                try (FileWriter fw = new FileWriter(file)) {
 
-                this.errorMessage = I18n.format("gts.gui.controller.save.done");
-            } catch (JsonParseException | IOException e) {
-                this.errorMessage = I18n.format("gts.gui.controller.save.error", e.getLocalizedMessage());
-            }
+                    GTSTileEntityTrafficController te = (GTSTileEntityTrafficController) tileEntity;
+                    String data = GTS.GSON.toJson(te.getCycles().toArray(), GTSCycle[].class); // サイクル情報を読み込みパース
+                    fw.write(data);
+
+                    this.errorMessage = I18n.format("gts.gui.controller.save.done");
+                } catch (JsonParseException | IOException e) {
+                    this.errorMessage = I18n.format("gts.gui.controller.save.error", e.getLocalizedMessage());
+                }
+            });
         }
     }
 

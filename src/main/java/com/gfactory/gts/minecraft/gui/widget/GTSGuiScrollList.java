@@ -90,7 +90,7 @@ public class GTSGuiScrollList extends GTSWidget<GTSTileEntity> {
         if (!inBounds) return;
 
         this.scrollOffset -= Math.signum(mouseWheel) * 5 * (Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT);
-        this.scrollOffset = MathHelper.clamp(this.scrollOffset, 0, this.maxHeight - this.height);
+        this.scrollOffset = MathHelper.clamp(this.scrollOffset, 0, Math.max(0, this.maxHeight - this.height));
     }
 
     @Override
