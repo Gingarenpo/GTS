@@ -6,6 +6,7 @@ import java.awt.Dimension;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JProgressBar;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import javax.swing.border.EtchedBorder;
@@ -38,9 +39,19 @@ public class GTSPackMaker {
 	public static final String VERSION = "0.1b - GTS2.0";
 	
 	/**
+	 * メニューバー
+	 */
+	public static GTSMenuBar menuBar;
+	
+	/**
 	 * ステータスバー
 	 */
 	public static JLabel statusBar;
+	
+	/**
+	 * プログレスバー
+	 */
+	public static JProgressBar progressBar;
 	
 	/**
 	 * サイドバー
@@ -64,6 +75,9 @@ public class GTSPackMaker {
 	
 	public static void main(String[] args) {
 		init();
+		window.getContentPane().revalidate();
+		window.getContentPane().repaint();
+		
 	}
 	
 	public static void init() {
@@ -91,15 +105,21 @@ public class GTSPackMaker {
 		
 		
 		// メニューバー設定
-		window.setJMenuBar(new GTSMenuBar(window));
+		menuBar = new GTSMenuBar(window);
+		window.setJMenuBar(menuBar);
 		window.setVisible(true);
 		
 		// ステータスバー設定
 		statusBar = new JLabel(I18n.format("status.noProjectOpen"));
 		statusBar.setHorizontalTextPosition(JLabel.LEFT);
-		JPanel statusPanel = new JPanel();
+		JPanel statusPanel = new JPanel(new BorderLayout(5, 5));
 		statusPanel.setBorder(new EtchedBorder());
-		statusPanel.add(statusBar);
+		statusPanel.add(statusBar, BorderLayout.WEST);
+		progressBar = new JProgressBar();
+		progressBar.setPreferredSize(new Dimension(config.getWindowSize().width / 4, 20));
+		progressBar.setMaximum(100);
+		progressBar.setMinimum(0);
+		statusPanel.add(progressBar, BorderLayout.EAST);
 		window.getContentPane().add(statusPanel, BorderLayout.SOUTH);
 		
 		// サイドバー設定

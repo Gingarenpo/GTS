@@ -23,7 +23,7 @@ public final class I18n {
 	public static String format(String key, String... args) {
 		try {
 			String template = bundle.getString(key);
-			return MessageFormat.format(template, (Object) args);
+			return MessageFormat.format(template, args);
 		} catch (MissingResourceException e) {
 			return key;
 		}
