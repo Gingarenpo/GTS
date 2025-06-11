@@ -1,5 +1,7 @@
 package com.gfactory.gts.tool.component;
 
+import static com.gfactory.gts.tool.GTSPackMakerConstants.*;
+
 import java.awt.event.KeyEvent;
 
 import javax.swing.JFrame;
@@ -39,6 +41,7 @@ public class GTSMenuBar extends JMenuBar {
 		// ファイルメニューのサブメニューを追加
 		// 新規プロジェクト作成
 		this.menuCreateProject.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, KeyEvent.CTRL_DOWN_MASK));
+		this.menuCreateProject.setIcon(ICON_DIRECTORY);
 		this.menuCreateProject.setToolTipText(I18n.format("menu.tooltip.createProject"));
 		this.menuCreateProject.addActionListener((e) -> {
 			ProjectEvent.createProject();
@@ -47,6 +50,7 @@ public class GTSMenuBar extends JMenuBar {
 		
 		// パックのインポート
 		this.menuImportPack.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_I, KeyEvent.CTRL_DOWN_MASK));
+		this.menuImportPack.setIcon(ICON_IMPORT);
 		this.menuImportPack.setToolTipText(I18n.format("menu.tooltip.importPack"));
 		this.menuImportPack.addActionListener((e) -> {
 			ProjectEvent.importProject();
@@ -55,6 +59,7 @@ public class GTSMenuBar extends JMenuBar {
 		
 		// パックのエクスポート
 		this.menuExportPack.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_E, KeyEvent.CTRL_DOWN_MASK));
+		this.menuExportPack.setIcon(ICON_EXPORT);
 		this.menuExportPack.setToolTipText(I18n.format("menu.tooltip.exportPack"));
 		this.menuExportPack.addActionListener((e) -> {
 			ProjectEvent.exportPack();

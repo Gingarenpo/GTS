@@ -49,6 +49,37 @@ public final class GTSPackMakerConstants {
 	 */
 	public static final ImageIcon ICON_TEXTURE = new ImageIcon(GTSPackMakerConstants.class.getResource("/tools/icons/texture.png"));
 	
-	public static final String[] SUPPORT_FORMAT = new String[] {".mqo", ".png", ".jpg", ".ogg", ".json"};
+	/**
+	 * ファイル作成用アイコン
+	 */
+	public static final ImageIcon ICON_NEW = new ImageIcon(GTSPackMakerConstants.class.getResource("/tools/icons/new.png"));
+	
+	/**
+	 * ディレクトリ用アイコン
+	 */
+	public static final ImageIcon ICON_DIRECTORY = new ImageIcon(GTSPackMakerConstants.class.getResource("/tools/icons/directory.png"));
+	
+	/**
+	 * インポート用アイコン
+	 */
+	public static final ImageIcon ICON_IMPORT = new ImageIcon(GTSPackMakerConstants.class.getResource("/tools/icons/import.png"));
+	
+	/**
+	 * エクスポート用アイコン
+	 */
+	public static final ImageIcon ICON_EXPORT = new ImageIcon(GTSPackMakerConstants.class.getResource("/tools/icons/export.png"));
+	
+	/**
+	 * ただのファイルアイコン
+	 */
+	public static final ImageIcon ICON_FILE = new ImageIcon(GTSPackMakerConstants.class.getResource("/tools/icons/file.png"));
+	
+	/**
+	 * サウンドアイコン
+	 */
+	public static final ImageIcon ICON_SOUND = new ImageIcon(GTSPackMakerConstants.class.getResource("/tools/icons/sound.png"));
+	
+	
+	
 
 }

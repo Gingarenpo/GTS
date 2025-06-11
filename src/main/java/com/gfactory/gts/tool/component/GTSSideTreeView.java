@@ -9,6 +9,7 @@ import java.awt.event.MouseListener;
 import java.io.File;
 
 import javax.swing.JOptionPane;
+import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultMutableTreeNode;
@@ -17,6 +18,7 @@ import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreePath;
 
 import com.gfactory.gts.tool.GTSPackMaker;
+import com.gfactory.gts.tool.component.tab.GTSTabTextureView;
 import com.gfactory.gts.tool.helper.I18n;
 
 /**
@@ -68,6 +70,9 @@ public class GTSSideTreeView extends JScrollPane implements MouseListener {
 		// ツリーモデルを適用する
 		this.projectTree.setModel(treeModel);
 		
+		// 表示
+		this.projectTree.setVisible(true);
+		
 	}
 	
 	private void initTreeModel() {
@@ -77,6 +82,7 @@ public class GTSSideTreeView extends JScrollPane implements MouseListener {
 		projectTree.setCellRenderer(new GTSFileTreeRender());
 		projectTree.setRowHeight(20);
 		projectTree.addMouseListener(this);
+		projectTree.setVisible(false);
 
 	}
 	
@@ -123,7 +129,7 @@ public class GTSSideTreeView extends JScrollPane implements MouseListener {
 				
 				// ファイルの拡張子によって分岐
 				if (file.isDirectory()) {
-					this.setIcon(ICON_CONTROLLER);
+					this.setIcon(ICON_DIRECTORY);
 				}
 				else if (file.getName().endsWith(".mqo")) {
 					this.setIcon(ICON_MODEL);
@@ -132,7 +138,10 @@ public class GTSSideTreeView extends JScrollPane implements MouseListener {
 					this.setIcon(ICON_TEXTURE);
 				}
 				else if (file.getName().endsWith(".json")) {
-					this.setIcon(ICON_CLOSE);
+					this.setIcon(ICON_FILE);
+				}
+				else if (file.getName().endsWith(".ogg")) {
+					this.setIcon(ICON_SOUND);
 				}
 				else {
 					this.setIcon(ICON_CLOSE);
@@ -156,6 +165,8 @@ public class GTSSideTreeView extends JScrollPane implements MouseListener {
 	public void mouseClicked(MouseEvent e) {
 		// ダブルクリックでない場合は無視
 		if (e.getClickCount() < 2) return;
+		
+		
 		// 選択状態のツリーパスを取得
 		TreePath path = this.projectTree.getPathForLocation(e.getX(), e.getY());
 		if (path == null) return; // 未選択の場合は無視
@@ -176,7 +187,10 @@ public class GTSSideTreeView extends JScrollPane implements MouseListener {
 			// MQOモデルファイルだった場合
 		}
 		else if (file.getName().endsWith(".png") || file.getName().endsWith(".jpg")) {
-			// テクスチャファイルだった場合
+			// テクスチャファイルだった場合、テクスチャタブを開く
+			JPanel panel = new GTSTabTextureView(file);
+			GTSPackMaker.mainView.addTab(file.getName(), ICON_TEXTURE, panel, "");
+			
 		}
 		else if (file.getName().endsWith(".json")) {
 			// コンフィグファイルだった場合

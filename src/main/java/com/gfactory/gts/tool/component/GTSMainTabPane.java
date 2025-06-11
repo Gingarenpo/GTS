@@ -64,11 +64,19 @@ public class GTSMainTabPane extends JTabbedPane {
 		
 		// この要素に置き換え
 		this.setTabComponentAt(index, p);
+		
+		// この要素をフォーカス
+		this.setSelectedIndex(index);
 	}
 	
 	@Override
 	public void addTab(String title, Component c) {
 		this.addTab(title, null, c, "");
+	}
+	
+	@Override
+	public void addTab(String title, Icon icon, Component c) {
+		this.addTab(title, icon, c, "");
 	}
 
 }

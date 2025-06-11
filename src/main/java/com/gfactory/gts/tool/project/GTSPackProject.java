@@ -112,7 +112,6 @@ public class GTSPackProject {
 			for (Integer chunk: chunks) {
 				max += chunk;
 			}
-			System.out.println(max);
 		}
 
 		@Override
