@@ -1,0 +1,8 @@
+# 仕様書の自動生成
+# gitリポジトリの内容から変化していないことを想定
+
+output-file: ${.}/how2use.docx
+standalone: true
+table-of-contents: true
+toc: true
+reference-doc: ${.}/reference.docx
