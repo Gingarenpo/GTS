@@ -1,6 +1,6 @@
 ---
 title: 'GTS - Ginren Traffic System'
-subject: 'モデルパック・データ仕様書'
+subtitle: 'モデルパック・データ仕様書'
 date: "2025/06/04"
 author: 
     - 銀河連邦
