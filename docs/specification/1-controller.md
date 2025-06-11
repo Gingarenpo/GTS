@@ -129,3 +129,4 @@ function getInitialPhase(te, detected, world) {
 ### カスタムスクリプトの指定方法
 
 `GTSScriptCycle`を`type`に指定し、`scriptPath`にパスを指定すればOKです。制御機の動作中は絶対に動かさないようにしてください。可能な限り、`mods`ディレクトリの中にある`GTS`ディレクトリに保存することをお勧めします。
+
