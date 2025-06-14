@@ -1,6 +1,7 @@
 package com.gfactory.gts.minecraft.block;
 
 import com.gfactory.gts.minecraft.gui.GTSGuiTrafficPole;
+import com.gfactory.gts.minecraft.item.GTSItems;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficPole;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
@@ -67,6 +68,7 @@ public class GTSBlockTrafficPole extends GTSBlock<GTSTileEntityTrafficPole> {
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) return false; // サーバーでは何も行わない
         if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
+        if (!playerIn.getHeldItem(hand).isEmpty() || playerIn.getHeldItem(hand).isItemEqual(new ItemStack(GTSItems.ATTACHMENT))) return false;
 
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof GTSTileEntityTrafficPole)) return false;

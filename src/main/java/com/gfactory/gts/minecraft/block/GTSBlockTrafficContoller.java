@@ -88,6 +88,8 @@ public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficContr
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
         if (!worldIn.isRemote) return false; // サーバーでは何も行わない
         if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
+        if (hand != EnumHand.MAIN_HAND) return false;
+
         // アイテムを持っているかチェックする（それ以外はGUIなのでアーリーリターンが使えずifのネストになっている
         ItemStack item = playerIn.getHeldItem(hand);
         if (item.isItemEqual(new ItemStack(GTSItems.ATTACHMENT))) {
@@ -140,6 +142,7 @@ public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficContr
             }
             return true;
         }
+        else if (!item.isEmpty()) return true;
 
         // そうでない場合はGUIを開く
         TileEntity te = worldIn.getTileEntity(pos);
