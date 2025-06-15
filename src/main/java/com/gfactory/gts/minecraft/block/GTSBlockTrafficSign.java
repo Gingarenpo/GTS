@@ -1,6 +1,6 @@
 package com.gfactory.gts.minecraft.block;
 
-import com.gfactory.gts.minecraft.gui.GTSGuiTrafficSign;
+import com.gfactory.gts.minecraft.gui.sign.GTSGui114Sign;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficSign;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.client.Minecraft;
@@ -31,7 +31,7 @@ public class GTSBlockTrafficSign extends GTSBlock<GTSTileEntityTrafficSign> {
         // GUI開く
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof GTSTileEntityTrafficSign)) return false;
-        Minecraft.getMinecraft().displayGuiScreen(new GTSGuiTrafficSign((GTSTileEntityTrafficSign) te));
+        Minecraft.getMinecraft().displayGuiScreen(new GTSGui114Sign((GTSTileEntityTrafficSign) te));
         return true;
     }
 }

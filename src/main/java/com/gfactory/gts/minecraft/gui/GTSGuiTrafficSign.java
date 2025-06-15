@@ -1,7 +1,9 @@
 package com.gfactory.gts.minecraft.gui;
 
 import com.gfactory.gts.common.GTSSignTextureManager;
+import com.gfactory.gts.common.sign.GTSSignBase;
 import com.gfactory.gts.minecraft.GTS;
+import com.gfactory.gts.minecraft.gui.sign.GTSGui114Sign;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficSign;
 import net.minecraft.client.Minecraft;
@@ -10,78 +12,77 @@ import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
-import net.minecraftforge.fml.client.config.GuiCheckBox;
 
 import java.awt.*;
 import java.io.IOException;
 import java.util.ArrayList;
 
-public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
+public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GTSTileEntityTrafficSign> {
 
     /**
      * 日本語部分
      */
-    private GuiTextField japanese;
+    protected GuiTextField japanese;
 
     /**
      * 英語部分
      */
-    private GuiTextField english;
+    protected GuiTextField english;
 
     /**
      * 文字色・枠色
      */
-    private GuiTextField foreGroundColor;
+    protected GuiTextField foreGroundColor;
 
     /**
      * 背景色
      */
-    private GuiTextField backGroundColor;
-
-    /**
-     * 幅固定？
-     */
-    private GuiCheckBox fixed;
-
-    /**
-     * 設置する地名板の幅
-     */
-    private GuiTextField signWidth;
-
-    /**
-     * 設置する地名板の高さ
-     */
-    private GuiTextField signHeight;
-
-    /**
-     * 設置する地名板の奥行
-     */
-    private GuiTextField signDepth;
+    protected GuiTextField backGroundColor;
 
     /**
      * 日本語フォント
      */
-    private GuiTextField japaneseFont;
+    protected GuiTextField japaneseFont;
 
     /**
      * 英語フォント
      */
-    private GuiTextField englishFont;
+    protected GuiTextField englishFont;
+
+    /**
+     * 設置する標示板の幅
+     */
+    protected GuiTextField signWidth;
+
+    /**
+     * 設置する標示板の高さ
+     */
+    protected GuiTextField signHeight;
+
+    /**
+     * 設置する標示板の奥行
+     */
+    protected GuiTextField signDepth;
 
     /**
      * メッセージ（なんかいろいろ書くところ）
      */
-    private String message;
+    protected String message;
+
+    /**
+     * 苦肉の策で、地名板情報のクラスインスタンス
+     */
+    protected Class<T> clazz;
 
     /**
      * 必ずTileEntityを渡す必要がある
      *
      * @param tileEntity このGUIで使用するTileEntity
      */
-    public GTSGuiTrafficSign(GTSTileEntityTrafficSign tileEntity) {
+    public GTSGuiTrafficSign(GTSTileEntityTrafficSign tileEntity, Class<T> clazz) {
         super(tileEntity);
+        this.clazz = clazz;
     }
-
 
     @Override
     public void initGui() {
@@ -106,19 +107,11 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
                 I18n.format("gts.gui.sign.check.font.available")
         ));
 
-        this.addButton(new GuiCheckBox(
-                14,
-                this.width / 2 + MARGIN,
-                fontRenderer.FONT_HEIGHT * 7 + MARGIN * 8,
-                I18n.format("gts.gui.sign.fixed"),
-                tileEntity.is114Sign() && tileEntity.getInfo().widthFix
-        ));
-
         this.japanese = new GuiTextField(
                 11,
                 fontRenderer,
                 this.width / 2 + MARGIN,
-                fontRenderer.FONT_HEIGHT * 2 + MARGIN * 3,
+                fontRenderer.FONT_HEIGHT * 4 + MARGIN * 5,
                 (this.width / 2 - MARGIN * 3) / 2,
                 fontRenderer.FONT_HEIGHT
         );
@@ -126,7 +119,7 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
                 12,
                 fontRenderer,
                 this.width / 2 + MARGIN + this.width / 4,
-                fontRenderer.FONT_HEIGHT * 2 + MARGIN * 3,
+                fontRenderer.FONT_HEIGHT * 4 + MARGIN * 5,
                 (this.width / 2 - MARGIN * 3) / 2,
                 fontRenderer.FONT_HEIGHT
         );
@@ -135,7 +128,7 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
                 13,
                 fontRenderer,
                 this.width / 2 + MARGIN,
-                fontRenderer.FONT_HEIGHT * 4 + MARGIN * 5,
+                fontRenderer.FONT_HEIGHT * 2 + MARGIN * 3,
                 (this.width / 3 - MARGIN * 4) / 2,
                 fontRenderer.FONT_HEIGHT
         );
@@ -144,7 +137,7 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
                 15,
                 fontRenderer,
                 this.width / 2 + MARGIN + this.width / 6,
-                fontRenderer.FONT_HEIGHT * 4 + MARGIN * 5,
+                fontRenderer.FONT_HEIGHT * 2 + MARGIN * 3,
                 (this.width / 3 - MARGIN * 4) / 2,
                 fontRenderer.FONT_HEIGHT
         );
@@ -192,7 +185,7 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
                 fontRenderer.FONT_HEIGHT
         );
 
-        if (this.tileEntity.is114Sign()) {
+        if (this.tileEntity.isGenerated()) {
             this.japanese.setText(this.tileEntity.getInfo().japanese);
             this.english.setText(this.tileEntity.getInfo().english);
             this.backGroundColor.setText(String.format("%1$x", this.tileEntity.getInfo().color.getRGB()).substring(2));
@@ -232,7 +225,7 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
         // 左上にテクスチャ描画
         ResourceLocation texture = tileEntity.getTexture();
         if (texture != null) Minecraft.getMinecraft().getTextureManager().bindTexture(texture);
-        GTSGuiTrafficSign.drawScaledCustomSizeModalRect(0, 0, 0, 0, 1024, 1024, Math.min(this.width / 2, this.height / 2), Math.min(this.width / 2, this.height / 2), 1024, 1024);
+        GTSGui114Sign.drawScaledCustomSizeModalRect(0, 0, 0, 0, 1024, 1024, Math.min(this.width / 2, this.height / 2), Math.min(this.width / 2, this.height / 2), 1024, 1024);
 
         // メッセージ描画
         this.drawString(fontRenderer, this.message, MARGIN, this.height / 2 + MARGIN * 6 + fontRenderer.FONT_HEIGHT * 5 + 20, 0xffff00);
@@ -304,56 +297,15 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
                 return;
             }
 
-            // 地名板の情報を適用
-            if (this.tileEntity.is114Sign()) {
-                GTSSignTextureManager.GTS114Sign info = new GTSSignTextureManager.GTS114Sign();
-                try {
-                    int c1 = Integer.parseInt(this.foreGroundColor.getText().toUpperCase(), 16);
-                    info.textColor = new Color(c1);
-                } catch (NumberFormatException e) {
-                    // 赤文字にしてエラーを強調
-                    this.foreGroundColor.setTextColor(0xff0000);
-                    this.message = I18n.format("gts.gui.sign.message.fail");
-                    return;
-                }
-                try {
-                    int c2 = Integer.parseInt(this.backGroundColor.getText().toUpperCase(), 16);
-                    info.color = new Color(c2);
-                } catch (NumberFormatException e) {
-                    // 赤文字にしてエラーを強調
-                    this.backGroundColor.setTextColor(0xff0000);
-                    this.message = I18n.format("gts.gui.sign.message.fail");
-                    return;
-                }
-
-                // フォントはちゃんとした名前かどうかチェック
-                ArrayList<String> fonts = GTSSignTextureManager.getAvailableFonts();
-                if (!fonts.contains(japaneseFont.getText())) {
-                    this.japaneseFont.setTextColor(0xff0000);
-                    return;
-                }
-                if (!fonts.contains(englishFont.getText())) {
-                    this.englishFont.setTextColor(0xff0000);
-                    return;
-                }
-
-                info.japanese = this.japanese.getText();
-                info.english = this.english.getText();
-                info.japaneseFont = this.japaneseFont.getText();
-                info.englishFont = this.englishFont.getText();
-
-                // チェックボックスを取得して、その値を見る
-                for (GuiButton b: this.buttonList) {
-                    if (b.id == 14) info.widthFix = ((GuiCheckBox) b).isChecked();
-                }
-
-                info.aspect = this.tileEntity.getWidth() / this.tileEntity.getHeight();
+            // 地名板の情報を適用して送信
+            if (this.tileEntity.isGenerated()) {
+                GTSSignBase info = this.applyInfo();
+                if (info == null) return;
 
                 this.tileEntity.setInfo(info);
                 tileEntity.setTexture(GTSSignTextureManager.PLACE_HOLDER);
 
                 this.message = I18n.format("gts.gui.sign.message.apply");
-
                 GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.tileEntity.writeToNBT(new NBTTagCompound()), this.tileEntity.getPos(), GTSTileEntityTrafficSign.class));
                 tileEntity.markDirty();
                 tileEntity.getWorld().notifyBlockUpdate(
@@ -361,7 +313,6 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
                         tileEntity.getWorld().getBlockState(tileEntity.getPos()),
                         tileEntity.getWorld().getBlockState(tileEntity.getPos()),
                         3);
-
             }
         }
         else if (button.id == 2) {
@@ -373,5 +324,59 @@ public class GTSGuiTrafficSign extends GTSGui<GTSTileEntityTrafficSign> {
             }
             this.message = I18n.format("gts.gui.sign.message.fonts");
         }
+    }
+
+    /**
+     * GUIで行った変更を全て反映させるメソッド。
+     * 必ずフィールドを追加した場合はここもオーバーライドすること。
+     *
+     * @return エラーチェックに引っ掛かったらnull
+     */
+    public T applyInfo() {
+        T info = null;
+        try {
+            // 苦肉の策で無理やりインスタンスを作成する
+            info = this.clazz.newInstance();
+        } catch (InstantiationException | IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+        try {
+            int c1 = Integer.parseInt(this.foreGroundColor.getText().toUpperCase(), 16);
+            info.textColor = new Color(c1);
+        } catch (NumberFormatException e) {
+            // 赤文字にしてエラーを強調
+            this.foreGroundColor.setTextColor(0xff0000);
+            this.message = I18n.format("gts.gui.sign.message.fail");
+            return null;
+        }
+        try {
+            int c2 = Integer.parseInt(this.backGroundColor.getText().toUpperCase(), 16);
+            info.color = new Color(c2);
+        } catch (NumberFormatException e) {
+            // 赤文字にしてエラーを強調
+            this.backGroundColor.setTextColor(0xff0000);
+            this.message = I18n.format("gts.gui.sign.message.fail");
+            return null;
+        }
+
+        // フォントはちゃんとした名前かどうかチェック
+        ArrayList<String> fonts = GTSSignTextureManager.getAvailableFonts();
+        if (!fonts.contains(japaneseFont.getText())) {
+            this.japaneseFont.setTextColor(0xff0000);
+            return null;
+        }
+        if (!fonts.contains(englishFont.getText())) {
+            this.englishFont.setTextColor(0xff0000);
+            return null;
+        }
+
+        info.japanese = this.japanese.getText();
+        info.english = this.english.getText();
+        info.japaneseFont = this.japaneseFont.getText();
+        info.englishFont = this.englishFont.getText();
+
+        info.aspect = this.tileEntity.getWidth() / this.tileEntity.getHeight();
+
+        return info;
     }
 }
