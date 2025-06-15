@@ -5,6 +5,8 @@ import com.gfactory.core.mqo.MQOFace;
 import com.gfactory.core.mqo.MQOObject;
 import com.gfactory.core.mqo.MQOVertex;
 import com.gfactory.gts.common.GTSSignTextureManager;
+import com.gfactory.gts.common.sign.GTS114Sign;
+import com.gfactory.gts.common.sign.GTSSignBase;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.config.GTSTrafficSignConfig;
 import net.minecraft.client.resources.I18n;
@@ -44,7 +46,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
     /**
      * 地名板生成で使用するものの場合、ここにその情報が入る
      */
-    private GTSSignTextureManager.GTS114Sign info;
+    private GTSSignBase info;
 
     /**
      * MQOObjectを自前で作成する。直方体なので簡単。
@@ -68,7 +70,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
         this.config = new GTSTrafficSignConfig();
         this.config.setDummy();
         this.texture = null;
-        this.info = new GTSSignTextureManager.GTS114Sign();
+        this.info = new GTS114Sign();
         this.info.japanese = "ダミー";
         this.info.english = "DUMMY";
 
@@ -89,8 +91,15 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
         else {
             // 地名板の情報を読み込む
             this.texture = null;
-            this.info = new GTSSignTextureManager.GTS114Sign();
-            this.info.readFromNBT(compound.getCompoundTag("gts_sign_info"));
+            if (!compound.hasKey("gts_sign_info_type") || compound.getString("gts_sign_info_type").equals("GTS114Sign")) {
+                this.info = new GTS114Sign();
+                this.info.readFromNBT(compound.getCompoundTag("gts_sign_info"));
+            }
+            else {
+                // TODO: 他の標示板はelse ifブロックで書く。ここはどうしようもない場合なので普通来ない
+                this.info = new GTSSignBase();
+                this.info.readFromNBT(compound.getCompoundTag("gts_sign_info"));
+            }
         }
     }
 
@@ -102,13 +111,15 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
         compound.setDouble("gts_sign_depth", this.depth);
 
         // 地名板の種類
-        if (this.texture != null && !this.is114Sign()) {
+        if (this.texture != null && !this.isGenerated()) {
             // テクスチャ直指定の場合はそれを入れる（リソースロケーションを文字列にして）
             compound.setString("gts_sign_texture", texture.toString());
         }
-        if (this.is114Sign()) {
+        if (this.isGenerated()) {
             // 地名板指定の場合はその地名板の情報をすべて入れる
-            compound.setTag("gts_sign_info", this.info.writeToNBT());
+            if (this.info instanceof GTS114Sign) {
+                compound.setTag("gts_sign_info", ((GTS114Sign) this.info).writeToNBT());
+            }
         }
 
         return compound;
@@ -231,7 +242,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
     }
 
     public ResourceLocation getTexture() {
-        if ((this.texture == null || this.texture.equals(GTSSignTextureManager.PLACE_HOLDER)) && this.is114Sign()) {
+        if ((this.texture == null || this.texture.equals(GTSSignTextureManager.PLACE_HOLDER)) && this.isGenerated()) {
             this.texture = GTS.SIGN_MANAGER.getResourceLocation(this.info);
         }
         return texture;
@@ -250,11 +261,11 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
         this.buildObject();
     }
 
-    public GTSSignTextureManager.GTS114Sign getInfo() {
+    public GTSSignBase getInfo() {
         return info;
     }
 
-    public void setInfo(GTSSignTextureManager.GTS114Sign info) {
+    public void setInfo(GTSSignBase info) {
         this.info = info;
     }
 
@@ -262,7 +273,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
      * この地名板は動的に生成されたものであるかどうか
      * @return 動的の場合はtrue
      */
-    public boolean is114Sign() {
+    public boolean isGenerated() {
         return this.info != null;
     }
 
