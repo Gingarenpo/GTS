@@ -56,12 +56,9 @@ public abstract class GTSTileEntityRenderer<T extends GTSTileEntity, U extends G
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
         // ずらす
-        GL11.glTranslated(
-                x + 0.5 + te.getPosX() * Math.cos(te.getAngle()) + te.getPosZ() * Math.sin(te.getAngle()),
-                y + 0.5 + te.getPosY(),
-                z + 0.5 + te.getPosZ() * Math.cos(te.getAngle()) + te.getPosX() * Math.sin(te.getAngle())
-        ); // ブロックの原点を描画対象の座標に移動させる（ただしMQOの性質上原点を中心に移動させる）
-        GL11.glRotated(te.getAngle(), 0f, 1f, 0f); // 回転させる
+        GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5); // ブロック原点へ移動
+        GL11.glRotated(te.getAngle(), 0, 1, 0); // Y軸回転（ラジアン→度に変換）
+        GL11.glTranslated(te.getPosX(), te.getPosY(), te.getPosZ()); // ローカル座標オフセット
 
         // 描画
         this.renderModel((T) te, pack, config, Tessellator.getInstance(), model, x, y, z, partialTicks, destroyStage, alpha);
