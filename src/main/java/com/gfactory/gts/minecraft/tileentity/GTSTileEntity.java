@@ -48,6 +48,13 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
     protected double posZ;
 
     /**
+     * モデル描画座標を基準としたローカル回転軸
+     */
+    protected double rotateX;
+    protected double rotateY;
+    protected double rotateZ;
+
+    /**
      * 現在描画されているモデルの最小値・最大値
      */
     protected transient double[][] modelMinMax;
@@ -82,6 +89,9 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
         this.posX = GNBTHelper.getDoubleWithValue(compound, "gts_pos_x", 0.0f);
         this.posY = GNBTHelper.getDoubleWithValue(compound, "gts_pos_y", 0.0f);
         this.posZ = GNBTHelper.getDoubleWithValue(compound, "gts_pos_z", 0.0f);
+        this.rotateX = GNBTHelper.getDoubleWithValue(compound, "gts_rotate_x", 0.0f);
+        this.rotateY = GNBTHelper.getDoubleWithValue(compound, "gts_rotate_y", 0.0f);
+        this.rotateZ = GNBTHelper.getDoubleWithValue(compound, "gts_rotate_z", 0.0f);
 
         // パックとコンフィグの「名前」を読み込む
         String packName = compound.getString("gts_pack_name");
@@ -131,6 +141,9 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
         result.setDouble("gts_pos_x", this.posX);
         result.setDouble("gts_pos_y", this.posY);
         result.setDouble("gts_pos_z", this.posZ);
+        result.setDouble("gts_rotate_x", this.rotateX);
+        result.setDouble("gts_rotate_y", this.rotateY);
+        result.setDouble("gts_rotate_z", this.rotateZ);
         result = this.writeDataToNBT(result);
 
         return result;
@@ -301,5 +314,29 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
     @Override
     public double getMaxRenderDistanceSquared() {
         return Math.pow(128, 2);
+    }
+
+    public double getRotateX() {
+        return rotateX;
+    }
+
+    public void setRotateX(double rotateX) {
+        this.rotateX = rotateX;
+    }
+
+    public double getRotateY() {
+        return rotateY;
+    }
+
+    public void setRotateY(double rotateY) {
+        this.rotateY = rotateY;
+    }
+
+    public double getRotateZ() {
+        return rotateZ;
+    }
+
+    public void setRotateZ(double rotateZ) {
+        this.rotateZ = rotateZ;
     }
 }

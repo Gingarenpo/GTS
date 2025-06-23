@@ -55,9 +55,12 @@ public abstract class GTSTileEntityRenderer<T extends GTSTileEntity, U extends G
         GlStateManager.enableLighting();
         GlStateManager.shadeModel(GL11.GL_SMOOTH);
 
-        // ずらす
+        // ずらす（
         GL11.glTranslated(x + 0.5, y + 0.5, z + 0.5); // ブロック原点へ移動
         GL11.glRotated(te.getAngle(), 0, 1, 0); // Y軸回転（ラジアン→度に変換）
+        GL11.glRotated(te.getRotateX(), 1, 0, 0);
+        GL11.glRotated(te.getRotateY(), 0, 1, 0);
+        GL11.glRotated(te.getRotateZ(), 0, 0, 1);
         GL11.glTranslated(te.getPosX(), te.getPosY(), te.getPosZ()); // ローカル座標オフセット
 
         // 描画

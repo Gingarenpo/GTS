@@ -85,4 +85,10 @@ gts.gui.sign.message.fail=更新に失敗しました。赤文字を確認して
 gts.gui.sign.message.fonts=ログに有効なフォントを書き出しました
 
 
+
+gts.message.chat.no.attached=どの制御機にもアタッチしていないためボタンを押せません！
+gts.exception.pack_load.config=コンフィグの読み込みに失敗しました。 -> %1$s
+gts.gui.rotate.x=回転X
+gts.gui.rotate.y=回転Y
+gts.gui.rotate.z=回転Z
 tile.traffic_button.name=押ボタン箱
