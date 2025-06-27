@@ -313,7 +313,7 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
      */
     @Override
     public double getMaxRenderDistanceSquared() {
-        return Math.pow(128, 2);
+        return Math.pow(512, 2);
     }
 
     public double getRotateX() {
