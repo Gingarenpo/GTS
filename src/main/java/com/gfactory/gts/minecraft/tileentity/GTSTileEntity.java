@@ -107,7 +107,10 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
             for (Map.Entry<String, GTSConfig<GTSConfig.GTSTexture>> c: p.getConfigs().entrySet()) {
                 T cc = (T) c.getValue();
                 if (cc.getId().equals(packConfig)) {
-                    // 完全一致したのでここで終了
+                    // モデルが壊れていないかどうかチェック
+                    if (!p.isValid(cc)) {
+                        GTS.LOGGER.warn(I18n.format("gts.warning.pack_is_invalid", cc.getId()));
+                    }
                     this.pack = p;
                     this.config = cc;
                 }
