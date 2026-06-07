@@ -52,6 +52,21 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
     private GuiTextField posZ;
 
     /**
+     * 回転X相対ずれ
+     */
+    private GuiTextField rotateX;
+
+    /**
+     * 回転Y相対ずれ
+     */
+    private GuiTextField rotateY;
+
+    /**
+     * 回転Z相対ずれ
+     */
+    private GuiTextField rotateZ;
+
+    /**
      * 必ずTileEntityを渡す必要がある
      * @param tileEntity このGUIで使用するTileEntity
      */
@@ -68,16 +83,25 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
             if (this.posX.getText().isEmpty()) this.posX.setText("0");
             if (this.posY.getText().isEmpty()) this.posY.setText("0");
             if (this.posZ.getText().isEmpty()) this.posZ.setText("0");
+            if (this.rotateX.getText().isEmpty()) this.rotateX.setText("0");
+            if (this.rotateY.getText().isEmpty()) this.rotateY.setText("0");
+            if (this.rotateZ.getText().isEmpty()) this.rotateZ.setText("0");
             // 座標を検出
             try {
                 double posX = Math.round(Double.parseDouble(this.posX.getText()) * 1000f) / 1000f;
                 double posY = Math.round(Double.parseDouble(this.posY.getText()) * 1000f) / 1000f;
                 double posZ = Math.round(Double.parseDouble(this.posZ.getText()) * 1000f) / 1000f;
+                double rotateX = Math.round(Double.parseDouble(this.rotateX.getText()) % 360 * 1000f) / 1000f;
+                double rotateY = Math.round(Double.parseDouble(this.rotateY.getText()) % 360 * 1000f) / 1000f;
+                double rotateZ = Math.round(Double.parseDouble(this.rotateZ.getText()) % 360 * 1000f) / 1000f;
 
                 // TileEntity変更
                 this.tileEntity.setPosX(posX);
                 this.tileEntity.setPosY(posY);
                 this.tileEntity.setPosZ(posZ);
+                this.tileEntity.setRotateX(rotateX);
+                this.tileEntity.setRotateY(rotateY);
+                this.tileEntity.setRotateZ(rotateZ);
                 if (tileEntity instanceof GTSTileEntityDummy) return; // ダミーの場合は送信を行わない
                 this.tileEntity.markDirty();
                 GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.tileEntity.writeToNBT(new NBTTagCompound()), this.tileEntity.getPos(), GTSTileEntity.class));
@@ -91,6 +115,9 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
                 this.posX.setTextColor(0xff0000);
                 this.posY.setTextColor(0xff0000);
                 this.posZ.setTextColor(0xff0000);
+                this.rotateX.setTextColor(0xff0000);
+                this.rotateY.setTextColor(0xff0000);
+                this.rotateZ.setTextColor(0xff0000);
 
             }
 
@@ -111,6 +138,13 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
         this.posX.setText(String.valueOf(Math.round(tileEntity.getPosX() * 1000f) / 1000f));
         this.posY.setText(String.valueOf(Math.round(tileEntity.getPosY() * 1000f) / 1000f));
         this.posZ.setText(String.valueOf(Math.round(tileEntity.getPosZ() * 1000f) / 1000f));
+
+        this.rotateX = new GuiTextField(20005, fontRenderer, this.width / 2 + MARGIN * 2, this.height - MARGIN * 2 - 20 * 2 - fontRenderer.FONT_HEIGHT * 2, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
+        this.rotateY = new GuiTextField(20006, fontRenderer, this.width / 2 + MARGIN * 3 + this.width / 6, this.height - MARGIN * 2 - 20 * 2 - fontRenderer.FONT_HEIGHT * 2, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
+        this.rotateZ = new GuiTextField(20007, fontRenderer, this.width / 2 + MARGIN * 4 + this.width / 3, this.height - MARGIN * 2 - 20 * 2 - fontRenderer.FONT_HEIGHT * 2, this.width / 6 - MARGIN * 5, this.fontRenderer.FONT_HEIGHT);
+        this.rotateX.setText(String.valueOf(Math.round(tileEntity.getRotateX() * 1000f) / 1000f));
+        this.rotateY.setText(String.valueOf(Math.round(tileEntity.getRotateY() * 1000f) / 1000f));
+        this.rotateZ.setText(String.valueOf(Math.round(tileEntity.getRotateZ() * 1000f) / 1000f));
     }
 
     @Override
@@ -126,6 +160,13 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
         this.drawString(fontRenderer, I18n.format("gts.gui.position.x"), this.width / 2 + MARGIN * 3, this.posX.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
         this.drawString(fontRenderer, I18n.format("gts.gui.position.y"), this.width / 2 + MARGIN * 3 + this.width / 6, this.posY.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
         this.drawString(fontRenderer, I18n.format("gts.gui.position.z"), this.width / 2 + MARGIN * 3 + this.width / 3, this.posZ.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
+
+        this.rotateX.drawTextBox();
+        this.rotateY.drawTextBox();
+        this.rotateZ.drawTextBox();
+        this.drawString(fontRenderer, I18n.format("gts.gui.rotate.x"), this.width / 2 + MARGIN * 3, this.rotateX.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
+        this.drawString(fontRenderer, I18n.format("gts.gui.rotate.y"), this.width / 2 + MARGIN * 3 + this.width / 6, this.rotateY.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
+        this.drawString(fontRenderer, I18n.format("gts.gui.rotate.z"), this.width / 2 + MARGIN * 3 + this.width / 3, this.rotateZ.y - fontRenderer.FONT_HEIGHT, 0xFFFFFF);
 
 
         // GUIタイトル
@@ -147,6 +188,12 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
         this.posX.textboxKeyTyped(typedChar, keyCode);
         this.posY.textboxKeyTyped(typedChar, keyCode);
         this.posZ.textboxKeyTyped(typedChar, keyCode);
+        this.rotateX.setTextColor(0xffffff);
+        this.rotateY.setTextColor(0xffffff);
+        this.rotateZ.setTextColor(0xffffff);
+        this.rotateX.textboxKeyTyped(typedChar, keyCode);
+        this.rotateY.textboxKeyTyped(typedChar, keyCode);
+        this.rotateZ.textboxKeyTyped(typedChar, keyCode);
     }
 
     @Override
@@ -178,5 +225,8 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
         this.posX.mouseClicked(mouseX, mouseY, mouseButton);
         this.posY.mouseClicked(mouseX, mouseY, mouseButton);
         this.posZ.mouseClicked(mouseX, mouseY, mouseButton);
+        this.rotateX.mouseClicked(mouseX, mouseY, mouseButton);
+        this.rotateY.mouseClicked(mouseX, mouseY, mouseButton);
+        this.rotateZ.mouseClicked(mouseX, mouseY, mouseButton);
     }
 }

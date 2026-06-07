@@ -32,6 +32,16 @@ public class GTSTrafficArmConfig extends GTSConfig<GTSConfig.GTSTexture> {
      */
     private boolean drawStartPrimary = true;
 
+    /**
+     * endObjectのPosition
+     */
+    private float[] endObjectPosition = new float[3];
+
+    /**
+     * edgeObjectのPosition
+     */
+    private float[] edgeObjectPosition = new float[3];
+
     @Override
     public void setDummy() {
         this.baseObjects.add("normal");
@@ -75,5 +85,21 @@ public class GTSTrafficArmConfig extends GTSConfig<GTSConfig.GTSTexture> {
 
     public void setDrawStartPrimary(boolean drawStartPrimary) {
         this.drawStartPrimary = drawStartPrimary;
+    }
+
+    public float[] getEdgeObjectPosition() {
+        return edgeObjectPosition;
+    }
+
+    public void setEdgeObjectPosition(float[] edgeObjectPosition) {
+        this.edgeObjectPosition = edgeObjectPosition;
+    }
+
+    public float[] getEndObjectPosition() {
+        return endObjectPosition;
+    }
+
+    public void setEndObjectPosition(float[] endObjectPosition) {
+        this.endObjectPosition = endObjectPosition;
     }
 }

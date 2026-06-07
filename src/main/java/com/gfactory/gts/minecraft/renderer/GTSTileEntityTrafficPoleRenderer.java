@@ -74,8 +74,8 @@ public class GTSTileEntityTrafficPoleRenderer extends GTSTileEntityRenderer<GTST
             MQO armModel = armPack.getResizingModels(armConfig.getModel(), armConfig.getSize());
             if (armModel == null) continue;
 
-            Vec3d startPos = new Vec3d(te.getPos().getX(), te.getPos().getY(), te.getPos().getZ());
-            Vec3d endPos = new Vec3d(arm.getPos().getX(), arm.getPos().getY(), arm.getPos().getZ());
+            Vec3d startPos = new Vec3d(te.getPos().getX() + 0.5, te.getPos().getY() + 0.5, te.getPos().getZ() + 0.5);
+            Vec3d endPos = new Vec3d(arm.getPos().getX() + 0.5, arm.getPos().getY() + 0.5, arm.getPos().getZ() + 0.5);
 
             // 次のアームのために今の位置を保存
             GlStateManager.pushMatrix();
@@ -94,10 +94,11 @@ public class GTSTileEntityTrafficPoleRenderer extends GTSTileEntityRenderer<GTST
 
             // Y軸回転し、次にX軸回転
             GlStateManager.rotate((float)yaw, 0, 1, 0);
-            GlStateManager.rotate((float)pitch, 0, 0, 0);
+            GlStateManager.rotate((float)pitch, 0, 0, 1);
 
             // 回した方向からX軸に対して+sizeの半分平行移動（こうしないとポールの中心にアームが突き刺さる）
             GlStateManager.translate(armConfig.getSize() / 2.0, 0, 0);
+            GlStateManager.translate(armConfig.getEdgeObjectPosition()[0], armConfig.getEdgeObjectPosition()[1], armConfig.getEdgeObjectPosition()[2]);
 
             // 先頭オブジェクトを描画（相当に長いか、短いけどスタートは必ず書く場合
             if (baseLength >= armConfig.getSize() || armConfig.isDrawStartPrimary()) {
@@ -108,9 +109,9 @@ public class GTSTileEntityTrafficPoleRenderer extends GTSTileEntityRenderer<GTST
 
             // 次に、ベースオブジェクトを描画
             // 先っぽまで移動するのでサイズの半分移動し、その後さらにベースの半分移動して原点にする
-            GlStateManager.translate(baseLength / 2f + armConfig.getSize() / 2f, 0, 0);
+            GlStateManager.translate((baseLength + armConfig.getEndObjectPosition()[0] + armConfig.getEdgeObjectPosition()[0]) / 2f + armConfig.getSize() / 2f, 0, 0);
             // ベースの長さ/サイズ文拡大する
-            GlStateManager.scale(baseLength / armConfig.getSize() * 1.2, 1, 1);
+            GlStateManager.scale((baseLength + armConfig.getEndObjectPosition()[0] + armConfig.getEdgeObjectPosition()[0]) / armConfig.getSize(), 1, 1);
             // 描画
             if (baseLength >= 0) {
                 for (MQOObject o: armModel.getObjects()) {
@@ -127,6 +128,7 @@ public class GTSTileEntityTrafficPoleRenderer extends GTSTileEntityRenderer<GTST
 
             // 先っぽまで移動するのでlength - size / 2する
             GlStateManager.translate(length - armConfig.getSize() / 2f, 0, 0);
+            GlStateManager.translate(armConfig.getEndObjectPosition()[0], armConfig.getEndObjectPosition()[1], armConfig.getEndObjectPosition()[2]);
 
             for (MQOObject o: armModel.getObjects()) {
                 if (armConfig.getEndObjects().contains(o.getName())) o.draw();
