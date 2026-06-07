@@ -49,6 +49,7 @@ item.gts.attachment.name=GTS Attachment
 item.gts.traffic_arm.name=Traffic Arm
 
 # GUI関連
+gts.gui.model_search=Search Model
 gts.gui.model_choose=Choose Model
 gts.gui.model.none=No Model Found
 gts.gui.channel.name=Channel Name

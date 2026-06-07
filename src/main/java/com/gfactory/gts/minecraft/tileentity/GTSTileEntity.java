@@ -279,6 +279,9 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
         AxisAlignedBB aabb = super.getRenderBoundingBox();
         if (this.pack == null || this.config == null) return aabb;
         MQO model = this.pack.getResizingModels(this.config.getModel(), this.config.getSize());
+        if (model == null) {
+            return aabb;
+        }
         for (MQOObject o: model.getObjects()) {
             MQOVertex[] r = o.getBoundingBox();
             aabb.union(new AxisAlignedBB(r[0].getX(), r[0].getY(), r[0].getZ(), r[1].getX(), r[1].getY(), r[1].getZ()));
