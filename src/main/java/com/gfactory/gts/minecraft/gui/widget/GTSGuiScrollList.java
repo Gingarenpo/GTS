@@ -20,7 +20,7 @@ public class GTSGuiScrollList extends GTSWidget<GTSTileEntity> {
     /**
      * この要素がスクロール要素として持つもの
      */
-    private final TreeMap<String, ? extends GTSConfig> choices;
+    private TreeMap<String, ? extends GTSConfig> choices;
 
     /**
      * 選択中の要素
@@ -116,5 +116,14 @@ public class GTSGuiScrollList extends GTSWidget<GTSTileEntity> {
             }
             absoluteY += Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
         }
+    }
+
+    public TreeMap<String, ? extends GTSConfig> getChoices() {
+        return choices;
+    }
+
+    public void setChoices(TreeMap<String, ? extends GTSConfig> choices) {
+        this.choices = choices;
+        this.maxHeight = Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * choices.size();
     }
 }
