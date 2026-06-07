@@ -16,6 +16,7 @@ gts.message.find.class=Found child class: %1$s
 gts.warning.nbt_cannot_load=NBT Warning: The %1$s name "%2$s" cannot loaded. It will be steel dummy.
 gts.warning.texture_cannot_load=Texture Warning: "%1$s" cannot loaded. Ignore, do not render it.
 gts.warning.model_cannot_load=Model Warning: "%1$s" cannot loaded. Ignore, do not render it.
+gts.warning.pack_is_invalid=Pack Warning: "%1$s" is invalid config. It will be steel dummy.
 
 # チャット画面に出すメッセージ関連
 gts.message.chat.selected=%1$s Selected.

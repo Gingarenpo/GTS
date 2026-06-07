@@ -569,4 +569,18 @@ public class GTSPack {
     public HashMap<String, SoundEvent> getSoundEvents() {
         return soundEvents;
     }
+
+    /**
+     * このパックの最低限必須なリソースが全て存在しているかを確認する。
+     * 現時点では描画に致命的な影響をもたらす「モデル」だけを確認する。
+     * @return 必須のリソースがこのパックに存在しない場合はfalse
+     */
+    public boolean isValid(GTSConfig config) {
+        // コンフィグがそもそもNULLっている場合は検証失敗
+        if (config == null) return false;
+        // コンフィグがこのPackに属していない場合は検証失敗
+        if (!this.configs.containsValue(config)) return false;
+        // モデルがそもそも存在しない場合は検証失敗
+        return this.models.containsKey(config.getModel());
+    }
 }

@@ -14,6 +14,7 @@ gts.message.find.class=具象クラス「%1$s」を発見しました。
 gts.warning.nbt_cannot_load=NBT警告: 「%1$s」である「%2$s」の読み込みに失敗しました。ダミーモデルに置き換えます。
 gts.warning.texture_cannot_load=テクスチャ警告: 「%1$s」の読み込みに失敗したため、このテクスチャを含むモデルはレンダリングされません。
 gts.warning.model_cannot_load=モデル警告: 「%1$s」の読み込みに失敗したため、このモデルはレンダリングされません。
+gts.warning.pack_is_invalid=パック警告: 「%1$s」のコンフィグデータが不正のため、ダミーモデルに置き換えます。
 
 gts.message.chat.selected=%1$sが選択されました
 gts.message.chat.deselected=%1$sの選択を解除しました
