@@ -199,7 +199,7 @@ public class GTSPack {
         // 1. ZIPファイル内のエントリごとに繰り返す
         ZipEntry entry = null;
         while ((entry = zis.getNextEntry()) != null) {
-            GTS.LOGGER.debug(entry.getName());
+            GTS.LOGGER.info(entry.getName());
             bar.step(entry.getName());
             // 一旦バイナリファイルを読み込み
             byte[] data = readData(entry, zis);
@@ -386,17 +386,19 @@ public class GTSPack {
      * @return 読み込んだバイト列。NULLにはならんが全部0になっていることはある
      */
     private static byte[] readData(ZipEntry entry, ZipInputStream zis) {
-        byte[] data = new byte[(int) entry.getSize()];
-        try {
-            int read = 0;
-            while (read < entry.getSize()) {
-                read += zis.read(data, read, (int) (entry.getSize() - read)); // 直ぐに全部呼び出すことができないためWhileでガンバ
+        byte[] data = new byte[4096]; // Zipの処理によっては最初にエントリーサイズを取得できない場合がある
+        try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+            int len;
+            // サイズを事前に知りえない場合に備え、ストリームが切れるまでバッファ読み込みを行う
+            while ((len = zis.read(data)) != -1) {
+                baos.write(data, 0, len);
             }
+            return baos.toByteArray();
         } catch (IOException e) {
             // ファイルの読み込みに失敗した場合
             GTS.LOGGER.warn(I18n.format("gts.exception.pack_load.io", entry.getName(), e.getLocalizedMessage()));
+            return null;
         }
-        return data;
     }
 
     /**

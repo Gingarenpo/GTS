@@ -9,12 +9,23 @@ import com.gfactory.gts.minecraft.tileentity.GTSTileEntityDummy;
 import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSConfig;
 import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
 import net.minecraft.client.resources.I18n;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Map;
 import java.util.TreeMap;
 
 public abstract class GTSGuiModelChoose<T extends GTSTileEntity> extends GTSGui {
+
+    /**
+     * モデル検索ボックス
+     */
+    protected GuiTextField modelSearch;
+
+    protected GTSGuiScrollList scrollList;
+
     /**
      * 必ずTileEntityを渡す必要がある
      *
@@ -32,19 +43,58 @@ public abstract class GTSGuiModelChoose<T extends GTSTileEntity> extends GTSGui 
             elements.put(I18n.format("gts.gui.model.none"), null);
         }
         this.widgets.add(new GTSGuiModelView(this.tileEntity, this.width / 4, this.width / 4, this.width / 8, MARGIN));
-        this.widgets.add(new GTSGuiScrollList(
+        this.scrollList = new GTSGuiScrollList(
                 this.tileEntity,
                 this.width / 2,
-                this.height - this.width / 4 - MARGIN * 4 - 20,
+                this.height - this.width / 4 - MARGIN * 4 - 20 * 2,
                 MARGIN,
-                this.width / 4 + MARGIN * 3 + 20,
+                this.width / 4 + MARGIN * 3 + 20 * 2,
                 elements
-                ));
+        );
+        this.widgets.add(scrollList);
 
         // モデルを変更するボタンを追加
         GuiButton b = new GuiButton(10001, this.width / 8, this.width / 4 + MARGIN * 2, I18n.format("gts.gui.model_choose"));
         b.width = this.width / 4;
         this.addButton(b);
+
+        // 検索ボックスを追加
+        this.modelSearch = new GuiTextField(10002, this.fontRenderer, MARGIN, this.width / 4 + MARGIN * 5 + this.fontRenderer.FONT_HEIGHT * 3, this.width / 2 - MARGIN * 2, this.fontRenderer.FONT_HEIGHT);
+    }
+
+    @Override
+    public void drawScreen(int mouseX, int mouseY, float partialTicks) {
+        super.drawScreen(mouseX, mouseY, partialTicks);
+
+        this.modelSearch.drawTextBox();
+        this.drawString(this.fontRenderer, I18n.format("gts.gui.model_search"), MARGIN, this.modelSearch.y - this.fontRenderer.FONT_HEIGHT - MARGIN, 0xffffffff);
+    }
+
+    @Override
+    protected void mouseClicked(int mouseX, int mouseY, int mouseButton) throws IOException {
+        super.mouseClicked(mouseX, mouseY, mouseButton);
+        this.modelSearch.mouseClicked(mouseX, mouseY, mouseButton);
+    }
+
+    @Override
+    protected void keyTyped(char typedChar, int keyCode) throws IOException {
+        super.keyTyped(typedChar, keyCode);
+        this.modelSearch.textboxKeyTyped(typedChar, keyCode);
+
+        // 検索条件で絞り込む
+        TreeMap<String, ? extends GTSConfig> elements = getModelElements();
+        ArrayList<String> removeKeys = new ArrayList<>();
+        if (!this.modelSearch.getText().isEmpty()) {
+            for (Map.Entry<String, ? extends GTSConfig> entry: elements.entrySet()) {
+                if (!entry.getValue().getId().contains(this.modelSearch.getText())) {
+                    removeKeys.add(entry.getKey());
+                }
+            }
+            for (String removeKey: removeKeys) {
+                elements.remove(removeKey);
+            }
+        }
+        this.scrollList.setChoices(elements);
     }
 
     /**

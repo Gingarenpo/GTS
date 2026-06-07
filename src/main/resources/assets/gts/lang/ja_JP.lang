@@ -23,6 +23,7 @@ gts.message.chat.selection_override=警告: 以前の選択内容は上書きさ
 
 gts.exception.argument=一つ以上のパラメーターがNULLになっています。
 gts.exception.pack_load.io=「%1$s」を読み込めませんでした。理由: &2$s
+gts.exception.pack_load.size=「%1$s」を読み込めませんでした。サイズを読み取ることができません。
 gts.exception.pack_load.texture=%1$sはテクスチャとして認識されましたが、その読み込みに失敗しました。
 gts.exception.pack_load.model=%1$sはモデルとして認識されましたが、その読み込みに失敗しました。
 gts.exception.packet=パケットが壊れています！
@@ -40,6 +41,7 @@ itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTSアタッチメント
 item.gts.traffic_arm.name=アーム
 
+gts.gui.model_search=モデルパックを検索
 gts.gui.model_choose=モデルを確定
 gts.gui.model.none=モデルが見つかりません
 gts.gui.channel.name=チャンネル名
@@ -85,4 +87,10 @@ gts.gui.sign.message.fail=更新に失敗しました。赤文字を確認して
 gts.gui.sign.message.fonts=ログに有効なフォントを書き出しました
 
 
+
+gts.message.chat.no.attached=どの制御機にもアタッチしていないためボタンを押せません！
+gts.exception.pack_load.config=コンフィグの読み込みに失敗しました。 -> %1$s
+gts.gui.rotate.x=回転X
+gts.gui.rotate.y=回転Y
+gts.gui.rotate.z=回転Z
 tile.traffic_button.name=押ボタン箱
