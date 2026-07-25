@@ -39,7 +39,7 @@ public class GTSGui114Sign extends GTSGuiTrafficSign<GTS114Sign> {
         this.addButton(new GuiCheckBox(
                 14,
                 this.width / 2 + MARGIN,
-                fontRenderer.FONT_HEIGHT * 7 + MARGIN * 8,
+                fontRenderer.FONT_HEIGHT * 8 + MARGIN * 9,
                 I18n.format("gts.gui.sign.fixed"),
                 tileEntity.isGenerated() && tileEntity.getInfo() instanceof GTS114Sign && ((GTS114Sign) tileEntity.getInfo()).widthFix
         ));

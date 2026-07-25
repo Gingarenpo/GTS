@@ -127,6 +127,13 @@ public class GTSSignTextureManager {
      * @return その地名板を作成、あるいはキャッシュしたテクスチャのResourceLocation。ない場合はプレースホルダー
      */
     public ResourceLocation getResourceLocation(GTSSignBase info) {
+        if (info == null) return PLACE_HOLDER;
+
+        // 文字列が空の場合は生成処理に回さずプレースホルダーを返す
+        if (info.japanese == null || info.japanese.trim().isEmpty()) {
+            return PLACE_HOLDER;
+        }
+
         synchronized (this.generates) {
             // キャッシュを同期し、その中に既にテクスチャがあれば返す
             if (this.generates.containsKey(info)) {

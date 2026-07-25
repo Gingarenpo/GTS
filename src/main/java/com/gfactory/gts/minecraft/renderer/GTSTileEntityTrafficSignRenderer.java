@@ -24,10 +24,13 @@ public class GTSTileEntityTrafficSignRenderer extends GTSTileEntityRenderer<GTST
         // もろもろあるので回転を元に戻す
         GlStateManager.rotate((float) -te.getAngle(), 0, 1, 0);
         // モデルを取得
-        MQOObject body = te.getObject();
+        MQO body1 = te.getObject();
+        if (body1 == null) return;
+        MQOObject body = body1.getObjects().get(0);
         // テクスチャを取得
         ResourceLocation texture = te.getTexture();
         if (body == null) return; // 準備ができていない場合は描画しない
+        if (texture == null) return;
         if (texture != null) this.bindTexture(texture); // なぜかテクスチャnullだと落ちることがあるので初期中の初期は適当なテクスチャ
 
         // TODO: パフォーマンスを計測し、重くなるのであれば止める
@@ -73,5 +76,10 @@ public class GTSTileEntityTrafficSignRenderer extends GTSTileEntityRenderer<GTST
         GlStateManager.translate(point.getX(), point.getY(), point.getZ());
         GlStateManager.rotate((float) te.getAngle(), 0, 1, 0);
         body.draw();
+    }
+
+    @Override
+    public boolean hasModel() {
+        return false;
     }
 }

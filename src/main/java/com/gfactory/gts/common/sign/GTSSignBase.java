@@ -4,6 +4,7 @@ import com.gfactory.gts.common.IGTSNBTSerializable;
 import net.minecraft.nbt.NBTTagCompound;
 
 import java.awt.*;
+import java.util.Objects;
 
 /**
  * GTS内で作成することのできる地名板や標示板に関する情報を保存するインスタンス。
@@ -69,5 +70,24 @@ public class GTSSignBase implements IGTSNBTSerializable {
         compound.setString("english_font", englishFont);
         compound.setDouble("aspect", aspect);
         return compound;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        GTS114Sign that = (GTS114Sign) o;
+        return Objects.equals(japanese, that.japanese) &&
+                Objects.equals(english, that.english) &&
+                Objects.equals(color, that.color) &&
+                Objects.equals(textColor, that.textColor) &&
+                Objects.equals(japaneseFont, that.japaneseFont) &&
+                Objects.equals(englishFont, that.englishFont) &&
+                Double.compare(that.aspect, aspect) == 0;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(japanese, english, color, textColor, japaneseFont, englishFont, aspect);
     }
 }

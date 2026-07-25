@@ -345,4 +345,8 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
     public void setRotateZ(double rotateZ) {
         this.rotateZ = rotateZ;
     }
+
+    public MQO getObject() {
+        return this.pack.getModels().get(this.getConfig().getModel());
+    }
 }
