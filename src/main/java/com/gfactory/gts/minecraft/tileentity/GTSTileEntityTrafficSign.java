@@ -170,73 +170,79 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
         MQOVertex v6 = new MQOVertex(width, -height, -depth);
         MQOVertex v7 = new MQOVertex(-width, height, -depth);
         MQOVertex v8 = new MQOVertex(-width, -height, -depth);
-        // 6面を作成（表と裏以外適当）
+
+        // 6面を作成
         MQOFace f1 = new MQOFace(
                 0,
                 new double[][] {
-                        new double[] {0, 0},
+                        new double[] {0.0, 0.0},
                         new double[] {0.9, 0.0},
                         new double[] {0.9, 0.45},
-                        new double[] {0, 0.45}
+                        new double[] {0.0, 0.45}
                 },
                 new int[] {0, 2, 3, 1},
                 4
-        ); // 正面
+        ); // 正面 [「表面」領域: U 0.0~0.9, V 0.0~0.45]
+
         MQOFace f2 = new MQOFace(
                 0,
                 new double[][] {
-                        new double[] {0, 0.45},
-                        new double[] {0.9, 0.45},
                         new double[] {0.9, 0.9},
-                        new double[] {0, 0.9}
+                        new double[] {1.0, 0.9},
+                        new double[] {1.0, 1.0},
+                        new double[] {0.9, 1.0}
                 },
                 new int[] {2, 4, 5, 3},
                 4
-        ); // 背面
+        ); // 右側面
+
         MQOFace f3 = new MQOFace(
                 0,
                 new double[][] {
+                        new double[] {0.0, 0.45},
+                        new double[] {0.9, 0.45},
                         new double[] {0.9, 0.9},
-                        new double[] {0.9, 1},
-                        new double[] {1, 1},
-                        new double[] {1, 0.9}
+                        new double[] {0.0, 0.9}
                 },
                 new int[] {4, 6, 7, 5},
                 4
-        ); // 右側面
+        ); // 背面 [「裏面」領域: U 0.0~0.9, V 0.45~0.90]
+
         MQOFace f4 = new MQOFace(
                 0,
                 new double[][] {
                         new double[] {0.9, 0.9},
-                        new double[] {0.9, 1},
-                        new double[] {1, 1},
-                        new double[] {1, 0.9}
+                        new double[] {1.0, 0.9},
+                        new double[] {1.0, 1.0},
+                        new double[] {0.9, 1.0}
                 },
                 new int[] {6, 0, 1, 7},
                 4
         ); // 左側面
+
         MQOFace f5 = new MQOFace(
                 0,
                 new double[][] {
                         new double[] {0.9, 0.9},
-                        new double[] {0.9, 1},
-                        new double[] {1, 1},
-                        new double[] {1, 0.9}
+                        new double[] {1.0, 0.9},
+                        new double[] {1.0, 1.0},
+                        new double[] {0.9, 1.0}
                 },
                 new int[] {6, 4, 2, 0},
                 4
-        ); // 上
+        ); // 上面
+
         MQOFace f6 = new MQOFace(
                 0,
                 new double[][] {
                         new double[] {0.9, 0.9},
-                        new double[] {0.9, 1},
-                        new double[] {1, 1},
-                        new double[] {1, 0.9}
+                        new double[] {1.0, 0.9},
+                        new double[] {1.0, 1.0},
+                        new double[] {0.9, 1.0}
                 },
                 new int[] {1, 3, 5, 7},
                 4
-        ); // 右側面
+        ); // 下面
 
         MQOObject o = new MQOObject("body");
         o.getVertexs().addAll(Arrays.asList(v1, v2, v3, v4, v5, v6, v7, v8));
