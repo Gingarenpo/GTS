@@ -94,7 +94,7 @@ public class GTSTileEntityTrafficPoleRenderer extends GTSTileEntityRenderer<GTST
 
             // Y軸回転し、次にX軸回転
             GlStateManager.rotate((float)yaw, 0, 1, 0);
-            GlStateManager.rotate((float)pitch, 0, 0, 1);
+            GlStateManager.rotate((float)pitch, 1, 0, 0);
 
             // 回した方向からX軸に対して+sizeの半分平行移動（こうしないとポールの中心にアームが突き刺さる）
             GlStateManager.translate(armConfig.getSize() / 2.0, 0, 0);
@@ -109,9 +109,10 @@ public class GTSTileEntityTrafficPoleRenderer extends GTSTileEntityRenderer<GTST
 
             // 次に、ベースオブジェクトを描画
             // 先っぽまで移動するのでサイズの半分移動し、その後さらにベースの半分移動して原点にする
-            GlStateManager.translate((baseLength + armConfig.getEndObjectPosition()[0] + armConfig.getEdgeObjectPosition()[0]) / 2f + armConfig.getSize() / 2f, 0, 0);
+            GlStateManager.translate(armConfig.getSize() / 2f, 0, 0);
+            GlStateManager.translate(baseLength / 2f, 0, 0);
             // ベースの長さ/サイズ文拡大する
-            GlStateManager.scale((baseLength + armConfig.getEndObjectPosition()[0] + armConfig.getEdgeObjectPosition()[0]) / armConfig.getSize(), 1, 1);
+            GlStateManager.scale((baseLength + armConfig.getSize()/2f - armConfig.getEdgeObjectPosition()[0]) / armConfig.getSize(), 1, 1);
             // 描画
             if (baseLength >= 0) {
                 for (MQOObject o: armModel.getObjects()) {
@@ -124,7 +125,7 @@ public class GTSTileEntityTrafficPoleRenderer extends GTSTileEntityRenderer<GTST
             GlStateManager.pushMatrix();
             GlStateManager.rotate(-90, 0, 1, 0);
             GlStateManager.rotate((float)yaw, 0, 1, 0);
-            GlStateManager.rotate((float)pitch, 0, 0, 0);
+            GlStateManager.rotate((float)pitch, 1, 0, 0);
 
             // 先っぽまで移動するのでlength - size / 2する
             GlStateManager.translate(length - armConfig.getSize() / 2f, 0, 0);

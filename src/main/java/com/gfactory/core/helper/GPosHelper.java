@@ -65,6 +65,36 @@ public class GPosHelper {
 	}
 
 	/**
+	 * 二点間の距離を返す点ではgetDistanceと同一ですが、こちらは浮動小数点を受け取ります。
+	 * @param pos1 第1座標のXYZ座標
+	 * @param pos2 第2座標のXYZ座標
+	 * @return 距離
+	 */
+	public static double getDistanceDouble(double[] pos1, double[] pos2) {
+		// BlockPosをとる方式だと整数に丸められてしまうのでこちらは浮動小数点を受け付ける
+		final double x = Math.abs(pos1[0] - pos2[0]);
+		final double y = Math.abs(pos1[1] - pos2[1]);
+		final double z = Math.abs(pos1[2] - pos2[2]);
+
+		final double xz = Math.sqrt(Math.pow(x, 2) + Math.pow(z, 2)); // 平面上の長さ
+		final double xyz = Math.sqrt(Math.pow(xz, 2) + Math.pow(y, 2)); // これが距離
+
+		return xyz;
+	}
+
+	/**
+	 * floatに対応したバージョン
+	 * @param pos1
+	 * @param pos2
+	 * @return
+	 */
+	public static double getDistanceDouble(float[] pos1, float[] pos2) {
+		final double[] newPos1 = new double[] {pos1[0], pos1[1], pos1[2]};
+		final double[] newPos2 = new double[] {pos2[0], pos2[1], pos2[2]};
+		return getDistanceDouble(newPos1, newPos2);
+	}
+
+	/**
 	 * 指定された全数値において、すべてが一致していればtrueを返します。1つでも異なればfalseを返します。
 	 * @param pos 調べたい数値。doubleでいくらでも指定できます。
 	 * @return 全てが一致していればtrue、1つでも異なればfalse
