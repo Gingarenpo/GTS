@@ -71,6 +71,8 @@ gts.gui.controller.save.error=Cannot save controller info -> %1$s.
 gts.gui.controller.extension=Controller Info File
 gts.gui.controller.chooser.title=Load File
 gts.gui.controller.info=%1$d Cycle(s) registered.
+gts.gui.sign.114sign=Sign (114-A) Generate
+gts.gui.sign.use114sign=Use Sign (114-A) Generate
 gts.gui.sign.japanese=Japanese
 gts.gui.sign.english=English
 gts.gui.sign.japanese.font=Japanese Font
@@ -87,6 +89,7 @@ gts.gui.sign.check.font.available=Output Available Fonts (to LOG)
 gts.gui.sign.message.apply=Apply Sign info is done.
 gts.gui.sign.message.fail=Cannot apply. please check red color string.
 gts.gui.sign.message.fonts=Avaliable fonts are written to log.
+gts.gui.sign.message.missingtexture=No Texture Available.
 
 # 組み込み関連
 gts.cycle.fix.arg1=MainPed Green Tick
