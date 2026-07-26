@@ -115,10 +115,10 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
     }
 
     private void getTextureChoices() {
+        this.choices = new TreeMap<>();
         for (GTSPack pack: GTS.LOADER.getPacks()) {
             if (pack.dummy()) continue; // ダミーパックはスルー
             // パックの中身を読み込み
-            this.choices = new TreeMap<>();
             HashMap<String, BufferedImage> textures = pack.getTextures();
             for (Map.Entry<String, BufferedImage> entry: textures.entrySet()) {
                 String name = pack.getName() + ":" + entry.getKey();
@@ -158,7 +158,7 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
         this.use114Sign = new GuiCheckBox(
                 3,
                 this.width / 2 + MARGIN,
-                fontRenderer.FONT_HEIGHT * 1 + MARGIN * 2,
+                fontRenderer.FONT_HEIGHT + MARGIN * 2,
                 I18n.format("gts.gui.sign.use114sign"),
                 false
         );
