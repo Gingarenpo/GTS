@@ -151,6 +151,12 @@ public class GTSGuiScrollList extends GTSWidget<GTSTileEntity> {
         this.maxHeight = Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * choices.size();
     }
 
+    public void setSelectedChoice(String key) {
+        if (choices.containsKey(key)) {
+            this.selectedChoice = key;
+        }
+    }
+
     /**
      * 何も選択されていない状態に戻す
      */

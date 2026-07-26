@@ -22,10 +22,7 @@ import net.minecraftforge.fml.client.config.GuiCheckBox;
 import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GTSTileEntityTrafficSign> {
 
@@ -102,6 +99,11 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
     protected GuiTextField modelSearch;
 
     /**
+     * パックキャッシュ
+     */
+    protected GTSPack cache;
+
+    /**
      * 必ずTileEntityを渡す必要がある
      *
      * @param tileEntity このGUIで使用するTileEntity
@@ -110,11 +112,13 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
         super(tileEntity);
         this.clazz = clazz;
 
-        this.getTextureChoices();
+        this.cache = this.getTextureChoices();
 
     }
 
-    private void getTextureChoices() {
+    private GTSPack getTextureChoices() {
+        GTSTrafficSignConfig teConfig = (GTSTrafficSignConfig) this.tileEntity.getConfig();
+        GTSPack resPack = null;
         this.choices = new TreeMap<>();
         for (GTSPack pack: GTS.LOADER.getPacks()) {
             if (pack.dummy()) continue; // ダミーパックはスルー
@@ -123,13 +127,17 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
             for (Map.Entry<String, BufferedImage> entry: textures.entrySet()) {
                 String name = pack.getName() + ":" + entry.getKey();
                 if (this.modelSearch != null && !this.modelSearch.getText().isEmpty() && !name.contains(this.modelSearch.getText())) continue; // この選択肢は出さない
-                // 各エントリーに対してダミーの看板Configを作成
                 GTSTrafficSignConfig config = new GTSTrafficSignConfig();
                 config.setDummy();
                 config.setTexture(entry.getKey());
                 this.choices.put(pack.getName() + ":" + entry.getKey(), config);
+                if (Objects.equals(this.tileEntity.getConfig().getTextures().getBase(), entry.getKey())) {
+                    // 一致する場合、それを指し示すパックを返してあげるために代入
+                    resPack = pack;
+                }
             }
         }
+        return resPack;
     }
 
     @Override
@@ -276,6 +284,8 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
                 choices
         );
         this.widgets.add(this.textureScrollList);
+
+        this.textureScrollList.setSelectedChoice(this.cache.getName() + ":" + this.tileEntity.getConfig().getTextures().getBase());
     }
 
     @Override
@@ -337,8 +347,11 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
         this.englishFont.setTextColor(0xffffff);
 
         // モデルパックの絞り込み
-        this.getTextureChoices();
+        this.cache = this.getTextureChoices();
         this.textureScrollList.setChoices(this.choices);
+        if (this.cache != null) {
+            this.textureScrollList.setSelectedChoice(this.cache.getName() + ":" + this.tileEntity.getConfig().getTextures().getBase());
+        }
 
     }
 
