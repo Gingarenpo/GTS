@@ -1,9 +1,11 @@
 package com.gfactory.gts.minecraft.proxy;
 
+import com.gfactory.gts.common.GTSPackLoader;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.block.GTSBlocks;
 import com.gfactory.gts.minecraft.renderer.*;
 import com.gfactory.gts.minecraft.tileentity.*;
+import net.minecraft.client.Minecraft;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
@@ -11,6 +13,8 @@ import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+
+import java.io.File;
 
 /**
  * クライアント側のみで行う処理。
@@ -29,6 +33,11 @@ public class GTSClientProxy extends GTSProxy {
                 return new ItemStack(Item.getItemFromBlock(GTSBlocks.TRAFFIC_LIGHT));
             }
         };
+
+        // サーバー側ではリソースパックを読み込まないようにしてみる
+        GTS.LOADER = new GTSPackLoader();
+        // パックの検索
+        GTS.LOADER.searchPacks(new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "\\mods\\GTS"));
     }
 
     @Override

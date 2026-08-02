@@ -2,21 +2,20 @@ package com.gfactory.gts.minecraft.block;
 
 import com.gfactory.gts.common.capability.GTSCapabilities;
 import com.gfactory.gts.common.capability.IGTSSelection;
-import com.gfactory.gts.minecraft.gui.GTSGuiTrafficController;
+import com.gfactory.gts.minecraft.GTS;
+import com.gfactory.gts.minecraft.gui.GTSGuiHandler;
 import com.gfactory.gts.minecraft.item.GTSItems;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficButton;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficController> {
@@ -86,57 +85,58 @@ public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficContr
      */
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!worldIn.isRemote) return false; // サーバーでは何も行わない
         if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
         if (hand != EnumHand.MAIN_HAND) return false;
 
         // アイテムを持っているかチェックする（それ以外はGUIなのでアーリーリターンが使えずifのネストになっている
         ItemStack item = playerIn.getHeldItem(hand);
         if (item.isItemEqual(new ItemStack(GTSItems.ATTACHMENT))) {
-            // アタッチメントを持っている場合は、選択状態にあるかチェックする
-            IGTSSelection selection = playerIn.getCapability(GTSCapabilities.SELECTION_CAP, null);
-            if (selection != null && selection.getSelectedTileEntity() != null) {
-                // 選択されているものが交通信号機かチェックする
-                TileEntity te = worldIn.getTileEntity(selection.getSelectedTileEntity());
-                if (te instanceof GTSTileEntityTrafficLight) {
-                    // この交通信号機をアタッチするため、ここにあるTileEntityを取得する
-                    // ないとは思うがTileEntityが制御機のものか確認する
-                    TileEntity te2 = worldIn.getTileEntity(pos);
-                    if (te2 instanceof GTSTileEntityTrafficController) {
-                        // もうif文の嵐だが、既にある場合はデタッチ、ない場合はアタッチする
-                        GTSTileEntityTrafficController tet = (GTSTileEntityTrafficController) te2;
-                        if (tet.getAttachedTrafficLights().contains(selection.getSelectedTileEntity())) {
-                            tet.deattach((GTSTileEntityTrafficLight) te);
-                            ((GTSTileEntityTrafficLight) te).deattach(tet);
-                            playerIn.sendMessage(new TextComponentString(I18n.format("gts.message.chat.deattached", pos, selection.getSelectedTileEntity())));
-                        } else {
-                            playerIn.sendMessage(new TextComponentString(I18n.format("gts.message.chat.attached", pos, selection.getSelectedTileEntity())));
-                            tet.attach((GTSTileEntityTrafficLight) te);
-                            ((GTSTileEntityTrafficLight) te).attach(tet);
+            if (!worldIn.isRemote) { // サーバー側のみでの実行
+                // アタッチメントを持っている場合は、選択状態にあるかチェックする
+                IGTSSelection selection = playerIn.getCapability(GTSCapabilities.SELECTION_CAP, null);
+                if (selection != null && selection.getSelectedTileEntity() != null) {
+                    // 選択されているものが交通信号機かチェックする
+                    TileEntity te = worldIn.getTileEntity(selection.getSelectedTileEntity());
+                    if (te instanceof GTSTileEntityTrafficLight) {
+                        // この交通信号機をアタッチするため、ここにあるTileEntityを取得する
+                        // ないとは思うがTileEntityが制御機のものか確認する
+                        TileEntity te2 = worldIn.getTileEntity(pos);
+                        if (te2 instanceof GTSTileEntityTrafficController) {
+                            // もうif文の嵐だが、既にある場合はデタッチ、ない場合はアタッチする
+                            GTSTileEntityTrafficController tet = (GTSTileEntityTrafficController) te2;
+                            if (tet.getAttachedTrafficLights().contains(selection.getSelectedTileEntity())) {
+                                tet.deattach((GTSTileEntityTrafficLight) te);
+                                ((GTSTileEntityTrafficLight) te).deattach(tet);
+                                playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.deattached", pos, selection.getSelectedTileEntity()));
+                            } else {
+                                playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.attached", pos, selection.getSelectedTileEntity()));
+                                tet.attach((GTSTileEntityTrafficLight) te);
+                                ((GTSTileEntityTrafficLight) te).attach(tet);
+                            }
+                            selection.clearSelection();
+                            return true;
                         }
-                        selection.clearSelection();
-                        return true;
                     }
-                }
-                if (te instanceof GTSTileEntityTrafficButton) {
-                    // この押ボタン箱をアタッチするため、ここにあるTileEntityを取得する
-                    // ないとは思うがTileEntityが制御機のものか確認する
-                    TileEntity te2 = worldIn.getTileEntity(pos);
-                    if (te2 instanceof GTSTileEntityTrafficController) {
-                        // もうif文の嵐だが、既にある場合はデタッチ、ない場合はアタッチする
-                        GTSTileEntityTrafficController tet = (GTSTileEntityTrafficController) te2;
-                        if (tet.getAttachedTrafficButtons().contains(selection.getSelectedTileEntity())) {
-                            tet.deattach((GTSTileEntityTrafficButton) te);
-                            ((GTSTileEntityTrafficButton) te).deattach(tet);
-                            playerIn.sendMessage(new TextComponentString(I18n.format("gts.message.chat.deattached", pos, selection.getSelectedTileEntity())));
-                        } else {
-                            playerIn.sendMessage(new TextComponentString(I18n.format("gts.message.chat.attached", pos, selection.getSelectedTileEntity())));
-                            tet.attach((GTSTileEntityTrafficButton) te);
+                    if (te instanceof GTSTileEntityTrafficButton) {
+                        // この押ボタン箱をアタッチするため、ここにあるTileEntityを取得する
+                        // ないとは思うがTileEntityが制御機のものか確認する
+                        TileEntity te2 = worldIn.getTileEntity(pos);
+                        if (te2 instanceof GTSTileEntityTrafficController) {
+                            // もうif文の嵐だが、既にある場合はデタッチ、ない場合はアタッチする
+                            GTSTileEntityTrafficController tet = (GTSTileEntityTrafficController) te2;
+                            if (tet.getAttachedTrafficButtons().contains(selection.getSelectedTileEntity())) {
+                                tet.deattach((GTSTileEntityTrafficButton) te);
+                                ((GTSTileEntityTrafficButton) te).deattach(tet);
+                                playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.deattached", pos, selection.getSelectedTileEntity()));
+                            } else {
+                                playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.attached", pos, selection.getSelectedTileEntity()));
+                                tet.attach((GTSTileEntityTrafficButton) te);
 
-                            ((GTSTileEntityTrafficButton) te).attach(tet);
+                                ((GTSTileEntityTrafficButton) te).attach(tet);
+                            }
+                            selection.clearSelection();
+                            return true;
                         }
-                        selection.clearSelection();
-                        return true;
                     }
                 }
             }
@@ -147,7 +147,7 @@ public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficContr
         // そうでない場合はGUIを開く
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof GTSTileEntityTrafficController)) return false; // TileEntityとして不適切
-        Minecraft.getMinecraft().displayGuiScreen(new GTSGuiTrafficController((GTSTileEntityTrafficController) te));
+        if (!worldIn.isRemote) playerIn.openGui(GTS.instance, GTSGuiHandler.GUI_TRAFFIC_CONTROLLER, worldIn, pos.getX(), pos.getY(), pos.getZ());
         return true;
     }
 }

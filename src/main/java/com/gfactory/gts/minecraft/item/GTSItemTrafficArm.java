@@ -3,10 +3,9 @@ package com.gfactory.gts.minecraft.item;
 import com.gfactory.gts.common.capability.GTSCapabilities;
 import com.gfactory.gts.common.capability.IGTSSelection;
 import com.gfactory.gts.minecraft.GTS;
-import com.gfactory.gts.minecraft.gui.GTSGuiTrafficArm;
+import com.gfactory.gts.minecraft.gui.GTSGuiHandler;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficArm;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficPole;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.Item;
@@ -57,7 +56,7 @@ public class GTSItemTrafficArm extends Item {
         }
 
         // GUIを開く
-        Minecraft.getMinecraft().displayGuiScreen(new GTSGuiTrafficArm(te, playerIn.getHeldItem(handIn), playerIn.inventory.currentItem));
+        playerIn.openGui(GTS.instance, GTSGuiHandler.GUI_TRAFFIC_ARM, worldIn, playerIn.getPosition().getX(), playerIn.getPosition().getY(), playerIn.getPosition().getZ());
 
         return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
     }

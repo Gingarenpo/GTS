@@ -10,7 +10,6 @@ import com.gfactory.gts.pack.config.GTSConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.RuntimeTypeAdapterFactory;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.creativetab.CreativeTabs;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
@@ -50,7 +49,7 @@ public class GTS {
     /**
      * GTSの拡張パックを読み込むローダーインスタンス
      */
-    public static final GTSPackLoader LOADER = new GTSPackLoader();
+    public static GTSPackLoader LOADER = null;
 
     /**
      * クライアント側で読み込まなくてはならないもの、サーバー側で読み込まなくてはならないものの2種類がある
@@ -69,6 +68,12 @@ public class GTS {
     public static Gson GSON;
 
     /**
+     * GTSそのもののインスタンス
+     */
+    @Mod.Instance(GTS.MODID)
+    public static GTS instance;
+
+    /**
      * サーバーとクライアントの通信で使用する為のネットワークラッパー
      */
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(GTS.MODID);
@@ -78,21 +83,21 @@ public class GTS {
         // GTSCycleクラスをスキャンして登録する
         RuntimeTypeAdapterFactory<GTSCycle> typeFactory = RuntimeTypeAdapterFactory.of(GTSCycle.class, "type");
         for (Class<? extends GTSCycle> clazz: GTSClassScanner.findCycleClass()) {
-            GTS.LOGGER.debug(I18n.format("gts.message.find.class", clazz.getName()));
+            GTS.LOGGER.debug(String.format("Found child class: %1s", clazz.getName()));
             typeFactory.registerSubtype(clazz);
         }
 
         // GTSPhaseクラスをスキャンして登録する
         RuntimeTypeAdapterFactory<GTSPhase> typeFactory2 = RuntimeTypeAdapterFactory.of(GTSPhase.class, "type");
         for (Class<? extends GTSPhase> clazz: GTSClassScanner.findPhaseClass()) {
-            GTS.LOGGER.debug(I18n.format("gts.message.find.class", clazz.getName()));
+            GTS.LOGGER.debug(String.format("Found child class: %1s", clazz.getName()));
             typeFactory2.registerSubtype(clazz);
         }
 
         // GTSConfigクラスをスキャンして登録する
         RuntimeTypeAdapterFactory<GTSConfig> typeFactory3 = RuntimeTypeAdapterFactory.of(GTSConfig.class, "type");
         for (Class<? extends GTSConfig> clazz: GTSClassScanner.findConfigClass()) {
-            GTS.LOGGER.debug(I18n.format("gts.message.find.class", clazz.getName()));
+            GTS.LOGGER.debug(String.format("Found child class: %1s", clazz.getName()));
             typeFactory3.registerSubtype(clazz, clazz.getSimpleName().toLowerCase().replace("gts", "").replace("config", "").replace("traffic", ""));
         }
 

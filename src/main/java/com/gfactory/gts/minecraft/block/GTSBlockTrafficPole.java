@@ -1,11 +1,11 @@
 package com.gfactory.gts.minecraft.block;
 
-import com.gfactory.gts.minecraft.gui.GTSGuiTrafficPole;
+import com.gfactory.gts.minecraft.GTS;
+import com.gfactory.gts.minecraft.gui.GTSGuiHandler;
 import com.gfactory.gts.minecraft.item.GTSItems;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficPole;
 import net.minecraft.block.Block;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
 import net.minecraft.entity.EntityLivingBase;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -66,7 +66,6 @@ public class GTSBlockTrafficPole extends GTSBlock<GTSTileEntityTrafficPole> {
      */
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!worldIn.isRemote) return false; // サーバーでは何も行わない
         if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
         if (!playerIn.getHeldItem(hand).isEmpty() || playerIn.getHeldItem(hand).isItemEqual(new ItemStack(GTSItems.ATTACHMENT))) return false;
 
@@ -74,7 +73,7 @@ public class GTSBlockTrafficPole extends GTSBlock<GTSTileEntityTrafficPole> {
         if (!(te instanceof GTSTileEntityTrafficPole)) return false;
 
         // GUIを出す
-        Minecraft.getMinecraft().displayGuiScreen(new GTSGuiTrafficPole((GTSTileEntityTrafficPole) te));
+        if (!worldIn.isRemote) playerIn.openGui(GTS.instance, GTSGuiHandler.GUI_TRAFFIC_POLE, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return false;
     }

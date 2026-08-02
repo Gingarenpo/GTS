@@ -3,18 +3,17 @@ package com.gfactory.gts.minecraft.proxy;
 import com.gfactory.gts.common.GTSSignTextureManager;
 import com.gfactory.gts.common.capability.GTSCapabilities;
 import com.gfactory.gts.minecraft.GTS;
+import com.gfactory.gts.minecraft.gui.GTSGuiHandler;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketItemNBT;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.minecraft.tileentity.*;
-import net.minecraft.client.Minecraft;
 import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
-
-import java.io.File;
 
 /**
  * 各イベントにおいて、クライアントとサーバーを考えるとき、どっちかでしか実行してほしくないようなことがある。
@@ -24,8 +23,7 @@ import java.io.File;
  */
 public class GTSProxy {
     public void preInit(FMLPreInitializationEvent event) {
-        // パックの検索
-        GTS.LOADER.searchPacks(new File(Minecraft.getMinecraft().mcDataDir.getAbsolutePath() + "\\mods\\GTS"));
+
 
         // テクスチャマネージャーの登録
         GTS.SIGN_MANAGER = GTSSignTextureManager.getInstance();
@@ -43,6 +41,8 @@ public class GTSProxy {
     }
 
     public void init(FMLInitializationEvent event) {
+        // GUIハンドラの登録
+        NetworkRegistry.INSTANCE.registerGuiHandler(GTS.instance, new GTSGuiHandler());
     }
 
     public void postInit(FMLPostInitializationEvent event) {

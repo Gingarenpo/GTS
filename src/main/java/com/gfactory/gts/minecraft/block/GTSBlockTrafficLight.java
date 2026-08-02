@@ -2,20 +2,19 @@ package com.gfactory.gts.minecraft.block;
 
 import com.gfactory.gts.common.capability.GTSCapabilities;
 import com.gfactory.gts.common.capability.IGTSSelection;
-import com.gfactory.gts.minecraft.gui.GTSGuiTrafficLight;
+import com.gfactory.gts.minecraft.GTS;
+import com.gfactory.gts.minecraft.gui.GTSGuiHandler;
 import com.gfactory.gts.minecraft.item.GTSItems;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
 import net.minecraft.block.state.IBlockState;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.EnumHand;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.text.TextComponentString;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
 
 /**
@@ -45,7 +44,6 @@ public class GTSBlockTrafficLight extends GTSBlock<GTSTileEntityTrafficLight> {
      */
     @Override
     public boolean onBlockActivated(World worldIn, BlockPos pos, IBlockState state, EntityPlayer playerIn, EnumHand hand, EnumFacing facing, float hitX, float hitY, float hitZ) {
-        if (!worldIn.isRemote) return false; // サーバーでは何も行わない
         if (!super.onBlockActivated(worldIn, pos, state, playerIn, hand, facing, hitX, hitY, hitZ)) return false;
         if (hand != EnumHand.MAIN_HAND) return false;
 
@@ -54,26 +52,28 @@ public class GTSBlockTrafficLight extends GTSBlock<GTSTileEntityTrafficLight> {
 
         // アタッチメント持っている場合
         if (item.isItemEqual(new ItemStack(GTSItems.ATTACHMENT)) ) {
-            // 選択状態を保持するキャパビリティを取得
-            IGTSSelection selection = playerIn.getCapability(GTSCapabilities.SELECTION_CAP, null);
-            if (selection == null) return false;
+            if (!worldIn.isRemote) {
+                // 選択状態を保持するキャパビリティを取得
+                IGTSSelection selection = playerIn.getCapability(GTSCapabilities.SELECTION_CAP, null);
+                if (selection == null) return false;
 
-            // 既に選択されているものと一致したら解除
-            if (selection.getSelectedTileEntity() != null && selection.getSelectedTileEntity().equals(pos)) {
-                selection.clearSelection();
-                playerIn.sendMessage(new TextComponentString(I18n.format("gts.message.chat.deselected", pos.toString())));
-                return true;
+                // 既に選択されているものと一致したら解除
+                if (selection.getSelectedTileEntity() != null && selection.getSelectedTileEntity().equals(pos)) {
+                    selection.clearSelection();
+                    playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.deselected", pos.toString()));
+                    return true;
+                }
+
+                // まあ普通は信号機のTileEntityがあるはずだけどラグったりしてなかった時を踏まえてとりあえずエラーチェックはしておく
+                TileEntity te = worldIn.getTileEntity(pos);
+                if (!(te instanceof GTSTileEntityTrafficLight)) return false;
+                GTSTileEntityTrafficLight tet = (GTSTileEntityTrafficLight) te;
+
+
+                // 登録
+                selection.setSelectedTileEntity(pos);
+                playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.selected", tet.getPos().toString()));
             }
-
-            // まあ普通は信号機のTileEntityがあるはずだけどラグったりしてなかった時を踏まえてとりあえずエラーチェックはしておく
-            TileEntity te = worldIn.getTileEntity(pos);
-            if (!(te instanceof GTSTileEntityTrafficLight)) return false;
-            GTSTileEntityTrafficLight tet = (GTSTileEntityTrafficLight) te;
-
-
-            // 登録
-            selection.setSelectedTileEntity(pos);
-            playerIn.sendMessage(new TextComponentString(I18n.format("gts.message.chat.selected", tet.getPos().toString())));
 
             return true;
         }
@@ -83,7 +83,7 @@ public class GTSBlockTrafficLight extends GTSBlock<GTSTileEntityTrafficLight> {
         TileEntity te = worldIn.getTileEntity(pos);
         if (!(te instanceof GTSTileEntityTrafficLight)) return false;
         GTSTileEntityTrafficLight tet = (GTSTileEntityTrafficLight) te;
-        Minecraft.getMinecraft().displayGuiScreen(new GTSGuiTrafficLight(tet));
+        if (!worldIn.isRemote) playerIn.openGui(GTS.instance, GTSGuiHandler.GUI_TRAFFIC_LIGHT, worldIn, pos.getX(), pos.getY(), pos.getZ());
 
         return true;
     }

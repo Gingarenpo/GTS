@@ -7,6 +7,7 @@ import com.gfactory.gts.minecraft.tileentity.GTSTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityDummy;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.inventory.GuiContainer;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import org.lwjgl.input.Mouse;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
  * 基本前処理などはこちらが行う。
  * なお、各TileEntity即したGUI描画を行うため、Tには使用するTileEntityを挿入する必要がある。
  */
-public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
+public abstract class GTSGui<T extends GTSTileEntity> extends GuiContainer {
 
     /**
      * このGUIが保持するTileEntity
@@ -71,6 +72,7 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
      * @param tileEntity このGUIで使用するTileEntity
      */
     public GTSGui(T tileEntity) {
+        super(new GTSGuiDummyContainer());
         this.tileEntity = tileEntity;
         this.mc = Minecraft.getMinecraft();
         this.fontRenderer = Minecraft.getMinecraft().fontRenderer;
@@ -177,6 +179,17 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiScreen {
             w.draw();
         }
 
+    }
+
+    /**
+     * コンテナ内のバックグラウンドのレイヤーを記載するためのものだが必要ないので無視
+     * @param partialTicks
+     * @param mouseX
+     * @param mouseY
+     */
+    @Override
+    protected void drawGuiContainerBackgroundLayer(float partialTicks, int mouseX, int mouseY) {
+        // 無視
     }
 
     @Override
