@@ -43,11 +43,15 @@ public abstract class GTSTileEntityRenderer<T extends GTSTileEntity, U extends G
             GL11.glPopMatrix();
         }
         MQO model = pack.getResizingModels(config.getModel(), config.getSize());
-        if (model == null) {
+        if (model == null && this.hasModel()) {
             // モデルが存在しない場合描画を中止
             GTS.LOGGER.warn(I18n.format("gts.warning.model_cannot_load", config.getModel()));
             GL11.glPopMatrix();
             return; // 描画をしない
+        }
+        else if (model == null && !this.hasModel()) {
+            // getObjectから直接呼び出す
+            model = te.getObject();
         }
 
         // OpenGL設定
@@ -90,4 +94,13 @@ public abstract class GTSTileEntityRenderer<T extends GTSTileEntity, U extends G
     public abstract void renderModel(
             T te, GTSPack pack, U config, Tessellator t, MQO model,
             double x, double y, double z, float partialTicks, int destroyStage, float alpha);
+
+    /**
+     * このレンダーはモデルを持つのかどうか。自前でモデルを描画するときなど、モデルパックに頼らない場合はここでfalseにしておくとモデルを不要に読み込まない。
+     * その場合、getObjectから直接取得できる必要がある
+     * @return
+     */
+    public boolean hasModel() {
+        return true;
+    }
 }

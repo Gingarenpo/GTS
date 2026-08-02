@@ -37,7 +37,7 @@ public final class MQO {
 	 */
 	private ArrayList<MQOObject> objects = new ArrayList<>();
 
-	MQO() {}
+	public MQO() {}
 
 	public ArrayList<MQOObject> getObjects() {
 		return objects;

@@ -37,7 +37,7 @@ gts.exception.texture.create=テクスチャの作成に失敗しました -> %1
 tile.traffic_light.name=交通信号機
 tile.traffic_controller.name=交通信号制御機
 tile.traffic_pole.name=交通信号柱
-tile.traffic_sign.name=地名板
+tile.traffic_sign.name=標示板
 itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTSアタッチメント
 item.gts.traffic_arm.name=アーム
@@ -59,6 +59,8 @@ gts.gui.controller.save.done=サイクル情報をセーブしました
 gts.gui.controller.save.error=サイクル情報のセーブに失敗しました -> %1$s.
 gts.gui.controller.extension=制御機サイクル情報
 gts.gui.controller.chooser.title=制御機情報のロード・セーブ
+gts.gui.sign.114sign=114-A準拠地名板生成
+gts.gui.sign.use114sign=114-A準拠の地名板を生成する
 gts.gui.sign.japanese=日本語部分
 gts.gui.sign.english=英語部分
 gts.gui.sign.color.fore=文字色
@@ -86,6 +88,7 @@ gts.gui.sign.check.font.available=有効なフォント名一覧をログに出�
 gts.gui.sign.message.apply=正常に情報を更新しました
 gts.gui.sign.message.fail=更新に失敗しました。赤文字を確認してください。
 gts.gui.sign.message.fonts=ログに有効なフォントを書き出しました
+gts.gui.sign.message.missingtexture=有効なテクスチャが見つかりません！
 
 
 

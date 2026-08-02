@@ -4,7 +4,9 @@ import com.gfactory.gts.minecraft.tileentity.GTSTileEntity;
 import com.gfactory.gts.pack.config.GTSConfig;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.util.math.MathHelper;
+import org.lwjgl.opengl.GL11;
 
 import java.io.IOException;
 import java.util.Map;
@@ -56,30 +58,52 @@ public class GTSGuiScrollList extends GTSWidget<GTSTileEntity> {
 
     @Override
     public void draw() {
-        // 要素の大きさの背景を描く
+        Minecraft mc = Minecraft.getMinecraft();
+
+        // 1. 背景を描画
         Gui.drawRect(this.x, this.y, this.x + this.width, this.y + this.height, 0x20FFFFFF);
 
-        // 現在のスクロール位置からどこまで描画可能かを選択
+        // 2. Scissor Test による描画範囲（クリッピング領域）の計算と有効化
+        ScaledResolution sr = new ScaledResolution(mc);
+        int scale = sr.getScaleFactor();
+
+        // OpenGLの座標系は「左下」が原点のためY座標の反転変換が必要
+        int scissorX = this.x * scale;
+        int scissorY = mc.displayHeight - (this.y + this.height) * scale;
+        int scissorWidth = this.width * scale;
+        int scissorHeight = this.height * scale;
+
+        GL11.glEnable(GL11.GL_SCISSOR_TEST);
+        GL11.glScissor(scissorX, scissorY, scissorWidth, scissorHeight);
+
+        // 3. リスト要素の描画
+        int fontHeight = mc.fontRenderer.FONT_HEIGHT;
         int start = this.scrollOffset;
         int end = this.scrollOffset + this.height;
 
         int absoluteY = 0; // 絶対座標
-        for (Map.Entry<String, ? extends GTSConfig> entry: choices.entrySet()) {
-            if (absoluteY >= start) {
-                // 描画対象の場合
+        for (Map.Entry<String, ? extends GTSConfig> entry : choices.entrySet()) {
+            // 表示範囲に少しでも重なる要素のみ処理
+            if (absoluteY + fontHeight >= start && absoluteY <= end) {
+                int drawY = this.y + absoluteY - start;
+
                 if (Objects.equals(this.selectedChoice, entry.getKey())) {
-                    Gui.drawRect(this.x, this.y + absoluteY - start, this.x + this.width, this.y + absoluteY - start + Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT, 0x8000FF00);
+                    Gui.drawRect(this.x, drawY, this.x + this.width, drawY + fontHeight, 0x8000FF00);
                 }
-                Minecraft.getMinecraft().fontRenderer.drawString(entry.getKey(), this.x + 2, this.y + absoluteY - start, 0xFFFFFF);
+                mc.fontRenderer.drawString(entry.getKey(), this.x + 2, drawY, 0xFFFFFF);
             }
-            absoluteY += Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT;
+            absoluteY += fontHeight;
         }
 
-        // スクロールバーを書く
-        if (this.height >= this.maxHeight) return; // スクロールする必要がない
-        int barLength = (int) (((float)this.height / this.maxHeight) * this.height); // スクロールバーの大きさ
-        int barTop = (int) (((float)this.scrollOffset / this.maxHeight) * this.height); // スクロールバーの位置
-        Gui.drawRect(this.x + this.width - BAR_WIDTH, this.y + barTop, this.x + this.width, this.y + barTop + barLength, 0xFF00FF00);
+        // 4. Scissor Test を無効化（他の描画への影響を防ぐため）
+        GL11.glDisable(GL11.GL_SCISSOR_TEST);
+
+        // 5. スクロールバーの描画（Scissor領域外に出さない場合はここ、またはScissor解除前に行う）
+        if (this.height < this.maxHeight) {
+            int barLength = (int) (((float) this.height / this.maxHeight) * this.height);
+            int barTop = (int) (((float) this.scrollOffset / this.maxHeight) * this.height);
+            Gui.drawRect(this.x + this.width - BAR_WIDTH, this.y + barTop, this.x + this.width, this.y + barTop + barLength, 0xFF00FF00);
+        }
     }
 
 
@@ -125,5 +149,18 @@ public class GTSGuiScrollList extends GTSWidget<GTSTileEntity> {
     public void setChoices(TreeMap<String, ? extends GTSConfig> choices) {
         this.choices = choices;
         this.maxHeight = Minecraft.getMinecraft().fontRenderer.FONT_HEIGHT * choices.size();
+    }
+
+    public void setSelectedChoice(String key) {
+        if (choices.containsKey(key)) {
+            this.selectedChoice = key;
+        }
+    }
+
+    /**
+     * 何も選択されていない状態に戻す
+     */
+    public void resetChoice() {
+        this.selectedChoice = "";
     }
 }
