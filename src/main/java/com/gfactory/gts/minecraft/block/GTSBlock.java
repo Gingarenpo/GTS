@@ -102,7 +102,7 @@ public abstract class GTSBlock<T extends GTSTileEntity> extends BlockContainer {
         }
         // 角度情報を入れる
         EntityPlayer ep = (EntityPlayer) placer;
-        double angle = GMathHelper.normalizeAngle(-ep.getPitchYaw().y + 180);
+        double angle = GMathHelper.normalizeAngle(-ep.rotationYaw + 180);
         if (ep.isSneaking()) {
             // スニークしながら設置したら90度単位にスナップする
             angle = Math.round(angle / 90f) * 90f;

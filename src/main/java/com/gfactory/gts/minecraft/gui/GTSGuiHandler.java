@@ -3,6 +3,7 @@ package com.gfactory.gts.minecraft.gui;
 import com.gfactory.gts.minecraft.gui.sign.GTSGui114Sign;
 import com.gfactory.gts.minecraft.tileentity.*;
 import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
@@ -59,7 +60,13 @@ public class GTSGuiHandler implements IGuiHandler {
                 break;
             case GUI_TRAFFIC_ARM:
                 // アームの場合は少し特殊で、TileEntityが不要（というか存在しない）
-                return new GTSGuiTrafficArm(new GTSTileEntityTrafficArm(new BlockPos(x, y, z)), player.getHeldItem(player.getActiveHand()), player.inventory.currentItem);
+                //EnumHand hand = EnumHand.values()[x];
+                ItemStack stack = player.getHeldItem(player.swingingHand);
+                GTSTileEntityTrafficArm ate = new GTSTileEntityTrafficArm(null);
+                if (stack.hasTagCompound()) {
+                    ate.readFromNBT(stack.getTagCompound());
+                }
+                return new GTSGuiTrafficArm(ate, stack, player.inventory.currentItem);
             case GUI_TRAFFIC_BUTTON:
                 if (te instanceof GTSTileEntityTrafficButton) {
                     return new GTSGuiTrafficButton((GTSTileEntityTrafficButton) te);

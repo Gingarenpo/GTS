@@ -3,14 +3,12 @@ package com.gfactory.gts.pack;
 import com.gfactory.core.mqo.MQO;
 import com.gfactory.core.mqo.MQOException;
 import com.gfactory.core.mqo.MQOLoader;
+import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.config.*;
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
 import com.google.gson.JsonSyntaxException;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.DynamicTexture;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.ProgressManager;
@@ -185,7 +183,7 @@ public class GTSPack {
      * @throws IOException Zip内のファイル読み込みに失敗した場合
      */
     public static GTSPack load(ZipInputStream zis, File file) throws IllegalArgumentException, IOException {
-        if (zis == null || file == null) throw new IllegalArgumentException(I18n.format("gts.exception.argument"));
+        if (zis == null || file == null) throw new IllegalArgumentException(GTSI18n.i18n("gts.exception.argument"));
         // 0. 毎度作っていたらきりがないので定数の準備
         Pattern p = Pattern.compile("^(.+?)=(.*)$");
         GTSPack pack = new GTSPack();
@@ -241,7 +239,7 @@ public class GTSPack {
                     pack.textures.put(entry.getName(), texture);
                 } catch (IOException e) {
                     // 拡張子だけ変えて実は読み込めないとかそんな感じの場合
-                    GTS.LOGGER.warn(I18n.format("gts.exception.pack_load.texture", entry.getName()));
+                    GTS.LOGGER.warn(GTSI18n.i18n("gts.exception.pack_load.texture", entry.getName()));
                 }
             }
 
@@ -270,7 +268,7 @@ public class GTSPack {
                     pack.models.put(entry.getName(), mqo);
                 } catch (IOException | MQOException e) {
                     // 何らかのエラーの場合
-                    GTS.LOGGER.warn(I18n.format("gts.exception.pack_load.model", entry.getName()) + " -> " + e.getLocalizedMessage());
+                    GTS.LOGGER.warn(GTSI18n.i18n("gts.exception.pack_load.model", entry.getName()) + " -> " + e.getLocalizedMessage());
                 }
             }
         }
@@ -370,7 +368,7 @@ public class GTSPack {
             throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
         }
 
-        GTS.LOGGER.info(I18n.format("gts.message.pack_search.dummy"));
+        GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.dummy"));
         return pack;
     }
 
@@ -396,7 +394,7 @@ public class GTSPack {
             return baos.toByteArray();
         } catch (IOException e) {
             // ファイルの読み込みに失敗した場合
-            GTS.LOGGER.warn(I18n.format("gts.exception.pack_load.io", entry.getName(), e.getLocalizedMessage()));
+            GTS.LOGGER.warn(GTSI18n.i18n("gts.exception.pack_load.io", entry.getName(), e.getLocalizedMessage()));
             return null;
         }
     }
@@ -412,7 +410,7 @@ public class GTSPack {
         try {
             return GTS.GSON.fromJson(new String(data, StandardCharsets.UTF_8), GTSConfig.class);
         } catch (JsonParseException e) {
-            GTS.LOGGER.error(I18n.format("gts.exception.pack_load.config", e.getLocalizedMessage()));
+            GTS.LOGGER.error(GTSI18n.i18n("gts.exception.pack_load.config", e.getLocalizedMessage()));
             return null;
         }
     }
@@ -533,8 +531,10 @@ public class GTSPack {
         if (b == null) {
             return null; // そもそもテクスチャがない場合はnull
         }
-        r = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(name, new DynamicTexture(b));
-        this.bindTextures.put(name, r);
+        r = GTS.proxy.getOrCreateBindTexture(name, b);
+        if (r != null) {
+            this.bindTextures.put(name, r);
+        }
 
         return r;
     }

@@ -45,19 +45,17 @@ public class GTSItemTrafficArm extends Item {
      */
     @Override
     public ActionResult<ItemStack> onItemRightClick(World worldIn, EntityPlayer playerIn, EnumHand handIn) {
-        if (!worldIn.isRemote) return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
-
-        // プレイヤーの持ち物からデータを取得する
-        NBTTagCompound compound = playerIn.getHeldItem(handIn).getTagCompound();
-        GTSTileEntityTrafficArm te = new GTSTileEntityTrafficArm(null);
-        if (compound != null) {
-            // タグはないこともあるので一旦あるかどうか確認。あれば中身を読み込む
-            te.readFromNBT(compound);
+        if (!worldIn.isRemote) {
+            // x 引数に handIn.ordinal() (0: MAIN_HAND, 1: OFF_HAND) を格納して開く
+            playerIn.openGui(
+                    GTS.instance,
+                    GTSGuiHandler.GUI_TRAFFIC_ARM,
+                    worldIn,
+                    handIn.ordinal(),
+                    0,
+                    0
+            );
         }
-
-        // GUIを開く
-        playerIn.openGui(GTS.instance, GTSGuiHandler.GUI_TRAFFIC_ARM, worldIn, playerIn.getPosition().getX(), playerIn.getPosition().getY(), playerIn.getPosition().getZ());
-
         return new ActionResult<>(EnumActionResult.SUCCESS, playerIn.getHeldItem(handIn));
     }
 

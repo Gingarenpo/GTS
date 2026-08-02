@@ -73,47 +73,39 @@ public class GTSSignTextureManager {
     }
 
     private void createThread(GTSSignBase info, boolean dummy) {
-        // 作成を開始するため、新しくスレッドを追加する
-        Callable<BufferedImage> task = null;
-        if (info instanceof GTS114Sign) {
-            // 地名板の場合のタスク
-            task = () -> this.create114SignTexture((GTS114Sign) info);
-        }
-        else {
-            task = () -> this.create114SignTexture((GTS114Sign) info);
-        }
+        // 既に実行中であれば二重にタスクを投げない
+        //if (pendingTasks.containsKey(info)) return;
+
+        Callable<BufferedImage> task = () -> create114SignTexture((GTS114Sign) info);
         Future<BufferedImage> future = executor.submit(task);
 
-        // 実行中としてタスクを記録
         this.pendingTasks.put(info, future);
 
-        // 完了を検出し、タスクの消去などを行うスレッドを定義
         executor.submit(() -> {
             try {
                 BufferedImage result = future.get();
                 if (result != null) {
-                    // 既に完了していた場合
                     synchronized (this.generatesOriginal) {
-                        this.generatesOriginal.put(info, result); // キャッシュを格納
-                        Minecraft.getMinecraft().addScheduledTask(() -> {
-                            // OpenGLの利用はメインスレッドからでないとできないため、こちらで登録を行う
-                            ResourceLocation r = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(info.toString(), new DynamicTexture(result));
-                            if (!dummy) {
-                                synchronized (this.generates) {
-                                    this.generates.put(info, r);
-                                }
-                            }
-                            else {
-                                PLACE_HOLDER = r;
-                            }
-                        });
+                        this.generatesOriginal.put(info, result);
                     }
+
+                    // Minecraftのメインスレッドでテクスチャマネージャーに登録
+                    Minecraft.getMinecraft().addScheduledTask(() -> {
+                        DynamicTexture dynTex = new DynamicTexture(result);
+                        ResourceLocation r = Minecraft.getMinecraft().getTextureManager().getDynamicTextureLocation(info.toString(), dynTex);
+
+                        if (dummy) {
+                            PLACE_HOLDER = r;
+                        } else {
+                            synchronized (this.generates) {
+                                this.generates.put(info, r);
+                            }
+                        }
+                    });
                 }
             } catch (Exception e) {
-                // 何かしらの例外を拾った場合は通知を出す
                 GTS.LOGGER.warn(I18n.format("gts.exception.texture.create", e.getLocalizedMessage()));
             } finally {
-                // 失敗しようが成功しようが最終的にはタスクを実行終了するのでキューから消す
                 pendingTasks.remove(info);
             }
         });
