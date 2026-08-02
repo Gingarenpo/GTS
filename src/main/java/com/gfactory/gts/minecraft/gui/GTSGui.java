@@ -194,7 +194,6 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiContainer {
 
     @Override
     protected void keyTyped(char typedChar, int keyCode) throws IOException {
-        super.keyTyped(typedChar, keyCode);
         this.posX.setTextColor(0xffffff);
         this.posY.setTextColor(0xffffff);
         this.posZ.setTextColor(0xffffff);
@@ -207,6 +206,12 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiContainer {
         this.rotateX.textboxKeyTyped(typedChar, keyCode);
         this.rotateY.textboxKeyTyped(typedChar, keyCode);
         this.rotateZ.textboxKeyTyped(typedChar, keyCode);
+
+        // ESCキーのみで閉じる
+        if (keyCode == 1) {
+            this.mc.player.closeScreen();
+            return;
+        }
     }
 
     @Override

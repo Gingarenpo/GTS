@@ -55,7 +55,6 @@ public class GTSGuiTrafficController extends GTSGuiModelChoose<GTSTileEntityTraf
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
-        super.actionPerformed(button);
         if (button.id == 1) {
             // サイクルをロードする
             // 流石にMinecraftのGUIだけでは限界があるのでSwingを使う
@@ -124,6 +123,7 @@ public class GTSGuiTrafficController extends GTSGuiModelChoose<GTSTileEntityTraf
                 }
             });
         }
+        super.actionPerformed(button);
     }
 
     @Override

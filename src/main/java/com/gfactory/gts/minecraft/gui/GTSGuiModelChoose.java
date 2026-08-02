@@ -105,7 +105,6 @@ public abstract class GTSGuiModelChoose<T extends GTSTileEntity> extends GTSGui 
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
-        super.actionPerformed(button);
 
         if (button.id == 10001) {
             // Choose Modelが押された
@@ -129,5 +128,7 @@ public abstract class GTSGuiModelChoose<T extends GTSTileEntity> extends GTSGui 
             }
             throw new RuntimeException("あ！");
         }
+
+        super.actionPerformed(button);
     }
 }

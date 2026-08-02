@@ -91,7 +91,6 @@ public class GTSGuiTrafficLight extends GTSGuiModelChoose<GTSTileEntityTrafficLi
 
     @Override
     protected void actionPerformed(GuiButton button) throws IOException {
-        super.actionPerformed(button);
         if (button.id == 1) {
             // チャンネル名を更新する
             GTSTileEntityTrafficLight te = (GTSTileEntityTrafficLight) tileEntity;
@@ -104,5 +103,6 @@ public class GTSGuiTrafficLight extends GTSGuiModelChoose<GTSTileEntityTrafficLi
                     te.getWorld().getBlockState(te.getPos()),
                     3);
         }
+        super.actionPerformed(button);
     }
 }
