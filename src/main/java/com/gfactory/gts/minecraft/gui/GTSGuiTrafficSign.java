@@ -285,7 +285,9 @@ public abstract class GTSGuiTrafficSign<T extends GTSSignBase> extends GTSGui<GT
         );
         this.widgets.add(this.textureScrollList);
 
-        this.textureScrollList.setSelectedChoice(this.cache.getName() + ":" + this.tileEntity.getConfig().getTextures().getBase());
+        if (this.cache != null ) {
+            this.textureScrollList.setSelectedChoice(this.cache.getName() + ":" + this.tileEntity.getConfig().getTextures().getBase());
+        }
     }
 
     @Override
