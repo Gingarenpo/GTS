@@ -6,8 +6,11 @@ import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityDummy;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.*;
+import net.minecraft.client.gui.GuiButton;
+import net.minecraft.client.gui.GuiTextField;
+import net.minecraft.client.gui.ScaledResolution;
 import net.minecraft.client.gui.inventory.GuiContainer;
+import net.minecraft.client.renderer.GlStateManager;
 import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import org.lwjgl.input.Mouse;
@@ -156,6 +159,11 @@ public abstract class GTSGui<T extends GTSTileEntity> extends GuiContainer {
 
         // ボタンやラベルを描画
         super.drawScreen(mouseX, mouseY, partialTicks);
+
+        // カラーブレンディングを基に戻す
+        GlStateManager.color(1.0F, 1.0F, 1.0F, 1.0F);
+        GlStateManager.disableLighting();
+
         this.posX.drawTextBox();
         this.posY.drawTextBox();
         this.posZ.drawTextBox();
