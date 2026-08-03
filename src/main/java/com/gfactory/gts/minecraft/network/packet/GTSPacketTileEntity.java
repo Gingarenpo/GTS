@@ -49,7 +49,7 @@ public class GTSPacketTileEntity<T extends GTSTileEntity> implements IMessage, I
             GTSTileEntity te = (GTSTileEntity) t;
             te.readFromNBT(message.c);
             te.markDirty();
-            // world.notifyBlockUpdate(t.getPos(), world.getBlockState(t.getPos()), world.getBlockState(t.getPos()), 3);
+            world.notifyBlockUpdate(t.getPos(), world.getBlockState(t.getPos()), world.getBlockState(t.getPos()), 3);
         }
         return null;
     }
