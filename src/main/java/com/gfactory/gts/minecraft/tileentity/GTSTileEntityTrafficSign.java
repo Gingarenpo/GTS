@@ -5,13 +5,13 @@ import com.gfactory.core.mqo.MQO;
 import com.gfactory.core.mqo.MQOFace;
 import com.gfactory.core.mqo.MQOObject;
 import com.gfactory.core.mqo.MQOVertex;
+import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.common.GTSSignTextureManager;
 import com.gfactory.gts.common.sign.GTS114Sign;
 import com.gfactory.gts.common.sign.GTSSignBase;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSTrafficSignConfig;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.ResourceLocation;
 
@@ -62,7 +62,7 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
 
     @Override
     public String getName() {
-        return I18n.format("tile.traffic_sign.name");
+        return GTSI18n.i18n("tile.traffic_sign.name");
     }
 
     @Override

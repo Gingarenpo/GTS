@@ -4,10 +4,10 @@ import com.gfactory.core.helper.GNBTHelper;
 import com.gfactory.core.mqo.MQO;
 import com.gfactory.core.mqo.MQOObject;
 import com.gfactory.core.mqo.MQOVertex;
+import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSConfig;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
 import net.minecraft.network.play.server.SPacketUpdateTileEntity;
@@ -100,7 +100,7 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
         // これに置き換えるが、存在しない場合はダミーファイルに戻す
         GTSPack p = GTS.LOADER.getPack(packName);
         if (p == null) {
-            GTS.LOGGER.warn(I18n.format("gts.warning.nbt_cannot_load", "pack", packName));
+            GTS.LOGGER.warn(GTSI18n.i18n("gts.warning.nbt_cannot_load", "pack", packName));
             this.setDummy();
         }
         else {
@@ -109,7 +109,7 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
                 if (cc.getId().equals(packConfig)) {
                     // モデルが壊れていないかどうかチェック
                     if (!p.isValid(cc)) {
-                        GTS.LOGGER.warn(I18n.format("gts.warning.pack_is_invalid", cc.getId()));
+                        GTS.LOGGER.warn(GTSI18n.i18n("gts.warning.pack_is_invalid", cc.getId()));
                     }
                     this.pack = p;
                     this.config = cc;

@@ -1,5 +1,6 @@
 package com.gfactory.gts.minecraft.tileentity;
 
+import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.common.controller.GTSCycle;
 import com.gfactory.gts.common.controller.GTSFixCycle;
 import com.gfactory.gts.minecraft.GTS;
@@ -8,7 +9,6 @@ import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSTrafficControllerConfig;
 import com.gfactory.gts.pack.config.GTSTrafficLightConfig;
 import com.google.common.reflect.TypeToken;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
 import net.minecraft.util.ITickable;
@@ -58,7 +58,7 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
 
     @Override
     public String getName() {
-        return I18n.format("tile.traffic_controller.name");
+        return GTSI18n.i18n("tile.traffic_controller.name");
     }
 
 

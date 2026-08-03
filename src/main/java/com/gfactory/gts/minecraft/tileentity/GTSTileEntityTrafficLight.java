@@ -1,10 +1,10 @@
 package com.gfactory.gts.minecraft.tileentity;
 
+import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSTrafficLightConfig;
-import net.minecraft.client.resources.I18n;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.util.math.BlockPos;
 
@@ -37,7 +37,7 @@ public class GTSTileEntityTrafficLight extends GTSTileEntity<GTSTrafficLightConf
 
     @Override
     public String getName() {
-        return I18n.format("tile.traffic_light.name");
+        return GTSI18n.i18n("tile.traffic_light.name");
     }
 
     public void setDummy() {
