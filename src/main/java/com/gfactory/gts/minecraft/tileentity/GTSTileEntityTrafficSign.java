@@ -144,9 +144,12 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
                 System.out.println("save: " + this.pack.getName() + "@" + signConfig.getTextures().getBase());
                 compound.setString("gts_sign_texture", this.pack.getName() + "@" + signConfig.getTextures().getBase());
             }
+            compound.removeTag("gts_sign_info");
+            compound.removeTag("gts_sign_info_type");
         }
         else if (this.isGenerated()) {
             // 地名板指定の場合はその地名板の情報をすべて入れる
+            compound.removeTag("gts_sign_texture");
             if (this.info instanceof GTS114Sign) {
                 compound.setString("gts_sign_info_type", "GTS114Sign");
                 compound.setTag("gts_sign_info", ((GTS114Sign) this.info).writeToNBT());
@@ -305,7 +308,9 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
 
     public void setTexture(ResourceLocation texture) {
         this.texture = texture;
-        this.info = null;
+        if (!texture.equals(GTSSignTextureManager.PLACE_HOLDER)) {
+            this.info = null;
+        }
     }
 
     public double getWidth() {
