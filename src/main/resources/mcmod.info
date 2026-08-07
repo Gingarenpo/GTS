@@ -5,7 +5,7 @@
     "modid": "gts",
     "name": "GTS - Ginren Traffic System",
     "description": "Provide real traffic system to your world",
-    "version": "2.0-alpha2",
+    "version": "2.0-alpha5",
     "mcversion": "1.12.2",
     "url": "https://ginren.info/G-Factory/",
     "authorList": ["Gingarenpo"],

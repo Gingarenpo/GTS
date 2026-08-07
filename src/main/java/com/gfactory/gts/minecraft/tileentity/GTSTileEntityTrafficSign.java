@@ -91,7 +91,6 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
             this.info = null;
             this.texture = null;
             String textureData = compound.getString("gts_sign_texture");
-            System.out.println("Load: " + textureData);
             if (textureData.isEmpty()) return;
             String[] metaData = textureData.split("@");
             if (metaData.length != 2) return; // 無視
@@ -141,7 +140,6 @@ public class GTSTileEntityTrafficSign extends GTSTileEntity {
         if (this.info == null && this.pack != null && this.config != null) {
             GTSTrafficSignConfig signConfig = (GTSTrafficSignConfig) this.config;
             if (signConfig.getTextures() != null && signConfig.getTextures().getBase() != null) {
-                System.out.println("save: " + this.pack.getName() + "@" + signConfig.getTextures().getBase());
                 compound.setString("gts_sign_texture", this.pack.getName() + "@" + signConfig.getTextures().getBase());
             }
             compound.removeTag("gts_sign_info");
