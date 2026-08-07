@@ -1,5 +1,7 @@
-package com.gfactory.gts.common.controller;
+package com.gfactory.gts.common.controller.cycle;
 
+import com.gfactory.gts.common.controller.phase.GTSFixPhase;
+import com.gfactory.gts.common.controller.phase.GTSPhase;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import com.gfactory.gts.pack.config.GTSTrafficLightConfig;
 import net.minecraft.client.resources.I18n;

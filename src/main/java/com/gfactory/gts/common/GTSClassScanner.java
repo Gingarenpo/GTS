@@ -1,7 +1,7 @@
 package com.gfactory.gts.common;
 
-import com.gfactory.gts.common.controller.GTSCycle;
-import com.gfactory.gts.common.controller.GTSPhase;
+import com.gfactory.gts.common.controller.cycle.GTSCycle;
+import com.gfactory.gts.common.controller.phase.GTSPhase;
 import com.gfactory.gts.pack.config.GTSConfig;
 import io.github.classgraph.ClassGraph;
 import io.github.classgraph.ClassInfo;

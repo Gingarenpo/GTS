@@ -2,8 +2,8 @@ package com.gfactory.gts.minecraft.renderer;
 
 import com.gfactory.core.mqo.MQO;
 import com.gfactory.core.mqo.MQOObject;
-import com.gfactory.gts.common.controller.GTSCycle;
-import com.gfactory.gts.common.controller.GTSPhase;
+import com.gfactory.gts.common.controller.cycle.GTSCycle;
+import com.gfactory.gts.common.controller.phase.GTSPhase;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
 import com.gfactory.gts.pack.GTSPack;

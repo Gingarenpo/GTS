@@ -1,4 +1,4 @@
-package com.gfactory.gts.common.controller;
+package com.gfactory.gts.common.controller.cycle;
 
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;

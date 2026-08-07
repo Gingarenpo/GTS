@@ -1,6 +1,6 @@
 package com.gfactory.gts.minecraft.gui;
 
-import com.gfactory.gts.common.controller.GTSCycle;
+import com.gfactory.gts.common.controller.cycle.GTSCycle;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntity;

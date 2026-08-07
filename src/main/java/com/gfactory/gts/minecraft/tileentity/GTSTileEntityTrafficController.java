@@ -1,8 +1,8 @@
 package com.gfactory.gts.minecraft.tileentity;
 
 import com.gfactory.gts.common.GTSI18n;
-import com.gfactory.gts.common.controller.GTSCycle;
-import com.gfactory.gts.common.controller.GTSFixCycle;
+import com.gfactory.gts.common.controller.cycle.GTSCycle;
+import com.gfactory.gts.common.controller.cycle.GTSFixCycle;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.pack.GTSPack;

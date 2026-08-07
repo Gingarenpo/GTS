@@ -1,5 +1,6 @@
-package com.gfactory.gts.common.controller;
+package com.gfactory.gts.common.controller.cycle;
 
+import com.gfactory.gts.common.controller.phase.GTSPhase;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import net.minecraft.world.World;
 import org.apache.commons.lang3.RandomStringUtils;
