@@ -184,6 +184,15 @@ public abstract class GTSCycle {
         }
     }
 
+    /**
+     * 検知信号を「受信」したときに実行されるメソッド。これが呼ばれているとき、detectedはTrueとみなす。
+     * @param te 制御機のTE
+     * @param world 置かれている世界
+     */
+    public void onDetect(GTSTileEntityTrafficController te, World world) {
+        // NOOP
+    }
+
     public String getId() {
         return id;
     }

@@ -176,10 +176,19 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
                 if (this.cycles.get(i).canStart(this, this.detected, this.world)) {
                     // 次のサイクルを決定
                     this.nowCycle = i;
+                    this.detected = false; // 検知信号無視
+                    this.sendDetected(); // 押ボタンに終了を通知
+                    this.markDirty();
                     return;
                 }
             }
             // 実行可能なサイクルがない場合、判定を次に持ち越す（普通こんなことないようにする）
+        }
+        // アタッチしているボタンにも影響する
+        for (BlockPos pos: this.attachedTrafficButtons) {
+            if (this.world.getTileEntity(pos) == null) continue;
+            GTSTileEntityTrafficButton button = (GTSTileEntityTrafficButton) this.world.getTileEntity(pos);
+            System.out.println(button.isDetected());
         }
     }
 
@@ -212,7 +221,25 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
      * @param detected 検知信号のオンオフ。
      */
     public void setDetected(boolean detected) {
+        if (detected && !this.detected) {
+            this.cycles.get(this.nowCycle).onDetect(this, this.world);
+        }
         this.detected = detected;
+
+        this.markDirty();
+
+    }
+
+    /**
+     * アタッチしている押ボタンに対してもdetectedの状態をリセットする
+     */
+    public void sendDetected() {
+        // アタッチしているボタンにも影響する
+        for (BlockPos pos: this.attachedTrafficButtons) {
+            if (this.world.getTileEntity(pos) == null) continue;
+            GTSTileEntityTrafficButton button = (GTSTileEntityTrafficButton) this.world.getTileEntity(pos);
+            button.setDetected(detected);
+        }
     }
 
     @Override

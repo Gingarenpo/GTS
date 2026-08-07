@@ -81,6 +81,15 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
         this.maxWaitTick = compound.getInteger("gts_maxWaitTick");
         this.nowTick = compound.getInteger("gts_nowTick");
 
+        // アタッチされた制御機の状態を基に押ボタンが適切に戻るように仕向ける
+        if (this.attachedTrafficController != null && this.world != null) {
+            TileEntity te = this.world.getTileEntity(this.attachedTrafficController);
+            if (te instanceof GTSTileEntityTrafficController) {
+                GTSTileEntityTrafficController tec = (GTSTileEntityTrafficController) te;
+                this.detected = tec.isDetected();
+            }
+        }
+
     }
 
     @Override
@@ -182,6 +191,7 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
      */
     private void sendDetected() {
         if (this.attachedTrafficController == null) return;
+        if (this.world == null) return;
 
         // 制御機のTileEntityを取得
         TileEntity te = this.world.getTileEntity(this.attachedTrafficController);
@@ -189,6 +199,6 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
         GTSTileEntityTrafficController controller = (GTSTileEntityTrafficController) te;
 
         // 制御機の検知信号を更新
-        controller.setDetected(true);
+        controller.setDetected(this.detected);
     }
 }
