@@ -41,7 +41,6 @@ public class GTSDetectedCycle extends GTSDurationCycle {
     @Override
     public boolean tick(GTSTileEntityTrafficController te, boolean detected, World world) {
         long current = this.getExtendedWorldTime(world, this.detectStartTick, this.detectEndTick);
-        System.out.println(current);
         if (this.nowPhase == 0 && !(this.detectStartTick <= current && current <= this.detectEndTick)) {
             // 感知時間帯以外の場合でinitialフェーズの場合
             if (this.forceDetectTick < this.tick) {
