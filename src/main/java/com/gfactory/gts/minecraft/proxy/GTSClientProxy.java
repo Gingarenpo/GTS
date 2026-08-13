@@ -2,6 +2,7 @@ package com.gfactory.gts.minecraft.proxy;
 
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.block.GTSBlocks;
+import com.gfactory.gts.minecraft.client.GTSClientSoundManager;
 import com.gfactory.gts.minecraft.renderer.*;
 import com.gfactory.gts.minecraft.tileentity.*;
 import com.gfactory.gts.pack.GTSMemoryResourcePack;
@@ -40,6 +41,10 @@ public class GTSClientProxy extends GTSProxy {
             }
         };
 
+        // クライアントオーディオマネージャーを登録
+        GTS.CLIENT_SOUND_MANAGER = new GTSClientSoundManager();
+
+
     }
 
     @Override
@@ -52,6 +57,7 @@ public class GTSClientProxy extends GTSProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficPole.class, new GTSTileEntityTrafficPoleRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficSign.class, new GTSTileEntityTrafficSignRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficButton.class, new GTSTileEntityTrafficButtonRenderer());
+        ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficSpeaker.class, new GTSTileEntityTrafficSpeakerRenderer());
     }
 
     @Override

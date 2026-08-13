@@ -145,6 +145,11 @@ public class GTSPack {
      */
     public static final String DUMMY_TRAFFIC_BUTTON = "traffic_button";
 
+    /**
+     * ダミーモデルの定数（スピーカーモデル）
+     */
+    public static final String DUMMY_TRAFFIC_SPEAKER = "traffic_speaker";
+
     private GTSPack() {
 
     }
@@ -300,6 +305,7 @@ public class GTSPack {
             pack.models.put(GTSPack.DUMMY_TRAFFIC_POLE, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficpole.mqo")));
             pack.models.put(GTSPack.DUMMY_TRAFFIC_ARM, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficarm.mqo")));
             pack.models.put(GTSPack.DUMMY_TRAFFIC_BUTTON, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficbutton.mqo")));
+            pack.models.put(GTSPack.DUMMY_TRAFFIC_SPEAKER, MQOLoader.load(GTS.class.getResourceAsStream("/assets/gts/dummy/trafficspeaker.mqo")));
         } catch (IOException | MQOException e) {
             // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
             throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
@@ -359,6 +365,38 @@ public class GTSPack {
                     baos.write(data, 0, readByte);
                 }
                 pack.sounds.put(GTSPack.DUMMY_TRAFFIC_BUTTON + ".ogg", baos.toByteArray());
+            }
+
+        } catch (IOException e) {
+            // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
+            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+        }
+
+        try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/sounds/traffic_speaker_dummy.ogg")) {
+            if (is == null) throw new IOException();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                byte[] data = new byte[4096]; // 4KBずつ読み込み
+                int readByte = 0;
+                while ((readByte = is.read(data, 0, data.length)) != -1) {
+                    baos.write(data, 0, readByte);
+                }
+                pack.sounds.put(GTSPack.DUMMY_TRAFFIC_SPEAKER + "_dummy.ogg", baos.toByteArray());
+            }
+
+        } catch (IOException e) {
+            // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
+            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+        }
+
+        try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/sounds/traffic_speaker_flush.ogg")) {
+            if (is == null) throw new IOException();
+            try (ByteArrayOutputStream baos = new ByteArrayOutputStream()) {
+                byte[] data = new byte[4096]; // 4KBずつ読み込み
+                int readByte = 0;
+                while ((readByte = is.read(data, 0, data.length)) != -1) {
+                    baos.write(data, 0, readByte);
+                }
+                pack.sounds.put(GTSPack.DUMMY_TRAFFIC_SPEAKER + "_flush.ogg", baos.toByteArray());
             }
 
         } catch (IOException e) {

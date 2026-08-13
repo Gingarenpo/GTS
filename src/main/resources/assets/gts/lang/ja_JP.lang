@@ -38,6 +38,7 @@ tile.traffic_light.name=交通信号機
 tile.traffic_controller.name=交通信号制御機
 tile.traffic_pole.name=交通信号柱
 tile.traffic_sign.name=標示板
+tile.traffic_speaker.name=スピーカー
 itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTSアタッチメント
 item.gts.traffic_arm.name=アーム

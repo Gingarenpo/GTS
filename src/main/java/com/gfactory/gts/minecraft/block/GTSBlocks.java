@@ -49,6 +49,12 @@ public class GTSBlocks {
     public static final Item ITEM_TRAFFIC_BUTTON = new ItemBlock(TRAFFIC_BUTTON).setRegistryName(TRAFFIC_BUTTON.getRegistryName());
 
     /**
+     * 音響装置
+     */
+    public static final GTSBlockTrafficSpeaker TRAFFIC_SPEAKER = new GTSBlockTrafficSpeaker();
+    public static final Item ITEM_TRAFFIC_SPEAKER = new ItemBlock(TRAFFIC_SPEAKER).setRegistryName(TRAFFIC_SPEAKER.getRegistryName());
+
+    /**
      * ブロックをレジストリに追加する。これを行わないとMinecraft内でブロックを扱えない。
      * これで登録することでブロックIDが割り当てられる。
      * @param event イベント
@@ -60,6 +66,7 @@ public class GTSBlocks {
         event.getRegistry().register(TRAFFIC_POLE);
         event.getRegistry().register(TRAFFIC_SIGN);
         event.getRegistry().register(TRAFFIC_BUTTON);
+        event.getRegistry().register(TRAFFIC_SPEAKER);
     }
 
     /**
@@ -74,6 +81,7 @@ public class GTSBlocks {
         event.getRegistry().register(ITEM_TRAFFIC_POLE);
         event.getRegistry().register(ITEM_TRAFFIC_SIGN);
         event.getRegistry().register(ITEM_TRAFFIC_BUTTON);
+        event.getRegistry().register(ITEM_TRAFFIC_SPEAKER);
 
     }
 
@@ -108,6 +116,11 @@ public class GTSBlocks {
                 GTSBlocks.ITEM_TRAFFIC_BUTTON,
                 0,
                 new ModelResourceLocation(new ResourceLocation(GTS.MODID, "traffic_button"), "inventory")
+        );
+        ModelLoader.setCustomModelResourceLocation(
+                GTSBlocks.ITEM_TRAFFIC_SPEAKER,
+                0,
+                new ModelResourceLocation(new ResourceLocation(GTS.MODID, "traffic_speaker"), "inventory")
         );
     }
 }

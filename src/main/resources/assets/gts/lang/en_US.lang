@@ -45,6 +45,7 @@ tile.traffic_controller.name=Traffic Controller
 tile.traffic_pole.name=Traffic Pole
 tile.traffic_sign.name=Traffic Sign
 tile.traffic_button.name=Traffic Button
+tile.traffic_speaker.name=Traffic Speaker
 itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTS Attachment
 item.gts.traffic_arm.name=Traffic Arm

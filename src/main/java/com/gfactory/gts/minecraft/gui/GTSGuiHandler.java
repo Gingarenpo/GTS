@@ -78,7 +78,9 @@ public class GTSGuiHandler implements IGuiHandler {
                 }
                 break;
             case GUI_TRAFFIC_SPEAKER:
-                // 予約済み
+                if (te instanceof GTSTileEntityTrafficSpeaker) {
+                    return new GTSGuiTrafficSpeaker((GTSTileEntityTrafficSpeaker) te);
+                }
                 break;
             case GUI_TRAFFIC_SENSOR:
                 // 予約済み

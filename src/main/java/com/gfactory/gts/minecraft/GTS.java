@@ -5,6 +5,7 @@ import com.gfactory.gts.common.GTSPackLoader;
 import com.gfactory.gts.common.GTSSignTextureManager;
 import com.gfactory.gts.common.controller.cycle.GTSCycle;
 import com.gfactory.gts.common.controller.phase.GTSPhase;
+import com.gfactory.gts.minecraft.client.GTSClientSoundManager;
 import com.gfactory.gts.minecraft.proxy.GTSProxy;
 import com.gfactory.gts.pack.config.GTSConfig;
 import com.google.gson.Gson;
@@ -18,6 +19,8 @@ import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
+import net.minecraftforge.fml.relauncher.Side;
+import net.minecraftforge.fml.relauncher.SideOnly;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -50,6 +53,13 @@ public class GTS {
      * GTSの拡張パックを読み込むローダーインスタンス
      */
     public static GTSPackLoader LOADER = null;
+
+    /**
+     * クライアント側でのみ使用する、クライアントサウンドマネージャー
+     * サーバー側で使用するとクラッシュするので注意
+     */
+    @SideOnly(Side.CLIENT)
+    public static GTSClientSoundManager CLIENT_SOUND_MANAGER = null;
 
     /**
      * クライアント側で読み込まなくてはならないもの、サーバー側で読み込まなくてはならないものの2種類がある

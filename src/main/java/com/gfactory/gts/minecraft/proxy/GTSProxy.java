@@ -42,6 +42,7 @@ public class GTSProxy {
         GameRegistry.registerTileEntity(GTSTileEntityTrafficPole.class, new ResourceLocation(GTS.MODID, "traffic_pole"));
         GameRegistry.registerTileEntity(GTSTileEntityTrafficSign.class, new ResourceLocation(GTS.MODID, "traffic_sign"));
         GameRegistry.registerTileEntity(GTSTileEntityTrafficButton.class, new ResourceLocation(GTS.MODID, "traffic_button"));
+        GameRegistry.registerTileEntity(GTSTileEntityTrafficSpeaker.class, new ResourceLocation(GTS.MODID, "traffic_speaker"));
 
         // Capabilityの登録
         GTSCapabilities.register();
