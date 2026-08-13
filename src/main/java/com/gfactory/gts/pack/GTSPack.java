@@ -5,10 +5,8 @@ import com.gfactory.core.mqo.MQOException;
 import com.gfactory.core.mqo.MQOLoader;
 import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.minecraft.GTS;
-import com.gfactory.gts.pack.config.*;
-import com.google.gson.Gson;
+import com.gfactory.gts.pack.config.GTSConfig;
 import com.google.gson.JsonParseException;
-import com.google.gson.JsonSyntaxException;
 import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.ProgressManager;
@@ -414,57 +412,6 @@ public class GTSPack {
             return null;
         }
     }
-
-    /**
-     * 指定したZIPファイルのエントリのバイト列を利用して、その中身をもとにJSON読み込みを試す。
-     * 存在する全クラスを試すが、今はここを手打ちしている。どうにかしたい。
-     * GTSConfigを返すが、無効なJSONの場合はNULLを投げるので注意。
-     *
-     * 1.0との互換性を守るために頑張ってきたが無理なのでold扱い。
-     * 一応残しておくけど
-     *
-     * @param data readData等を使用して読み込んだバイト列
-     */
-    @Deprecated
-    private static GTSConfig readConfigOld(byte[] data) {
-        // 0. GSONインスタンスを作成し、コンフィグの読み込みを準備する
-        Gson gson = new Gson();
-
-        // 1. とにかく回す
-        try {
-            GTSTrafficButtonConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficButtonConfig.class);
-            if (config.getAudios() == null || config.getAudios().getBase() == null) throw new JsonSyntaxException("");
-        } catch (JsonSyntaxException e) {
-            try {
-                GTSTrafficArmConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficArmConfig.class);
-                if (config.getBaseObjects().isEmpty()) throw new JsonSyntaxException("");
-                return config;
-            } catch (JsonSyntaxException e2) {
-                try {
-                    GTSTrafficPoleConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficPoleConfig.class);
-                    if (config.getNormalObject() == null) throw new JsonSyntaxException("");
-                    return config;
-                } catch (JsonSyntaxException e3) {
-                    // JSONとして不正な場合
-                    try {
-                        GTSTrafficLightConfig config = gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficLightConfig.class);
-                        if (config.getLight() == null) throw new JsonSyntaxException("");
-                        return config;
-                    } catch (JsonSyntaxException e4) {
-                        try {
-                            return gson.fromJson(new String(data, StandardCharsets.UTF_8), GTSTrafficControllerConfig.class);
-                        } catch (JsonSyntaxException e5) {
-                            // JSONとして不正な場合
-                            GTS.LOGGER.warn("エラーだ！");
-                        }
-                    }
-                }
-            }
-        }
-
-        return null;
-    }
-
 
     /**
      * このパックの文字列表現を返す。見やすい形にして返すが基本的に仕様が定まっているわけではないのであくまでデバッグ用。

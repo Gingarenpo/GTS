@@ -173,6 +173,9 @@ public abstract class GTSCycle {
         else {
             // フェーズの終了の場合、次のフェーズへ移行する
             this.nextPhase(te, detected, world);
+            // フェーズ状況をクライアント通知
+            te.markDirty();
+            world.notifyBlockUpdate(te.getPos(), world.getBlockState(te.getPos()), world.getBlockState(te.getPos()), 3);
 
             if (this.end) {
                 // 終了の場合、リセットを行う

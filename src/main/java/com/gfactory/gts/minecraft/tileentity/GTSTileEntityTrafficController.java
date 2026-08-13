@@ -184,12 +184,7 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
             }
             // 実行可能なサイクルがない場合、判定を次に持ち越す（普通こんなことないようにする）
         }
-        // アタッチしているボタンにも影響する
-        for (BlockPos pos: this.attachedTrafficButtons) {
-            if (this.world.getTileEntity(pos) == null) continue;
-            GTSTileEntityTrafficButton button = (GTSTileEntityTrafficButton) this.world.getTileEntity(pos);
-            System.out.println(button.isDetected());
-        }
+
     }
 
     public ArrayList<GTSCycle> getCycles() {

@@ -48,7 +48,7 @@ public class GTSMemoryResourcePack implements IResourcePack {
         sb.append("{"); // JSONの始まりを示す物を追加
         for (String path: this.pack.getSounds().keySet()) {
             // これをキーとして登録（パック名がどうやら小文字じゃないとだめらしい）
-            sb.append("\"").append(this.getPackName().toLowerCase()).append(":").append(path.replace(".ogg", "")).append("\": {");
+            sb.append("\"").append(path.replace(".ogg", "")).append("\": {");
             // カテゴリ
             sb.append("\"category\": \"block\",");
             // sounds配列を開始
@@ -74,6 +74,8 @@ public class GTSMemoryResourcePack implements IResourcePack {
 
         // これをsoundJsonとする
         this.soundJson = sb.toString();
+
+        System.out.println(this.soundJson);
     }
 
     /**
@@ -88,11 +90,13 @@ public class GTSMemoryResourcePack implements IResourcePack {
         // ロケーションは、「gts_パック名:相対パス」で渡してくることを想定している
         // こうしないと他のModと競合する
         // なので相対パスをもとにファイルを探す
-        if (this.pack.getSounds().containsKey(location.getResourcePath())) {
+        String path = location.getResourcePath();
+        String soundKey = path.startsWith("sounds/") ? path.substring(7) : path;
+        if (this.pack.getSounds().containsKey(soundKey)) {
             // サウンドの中にあればそれを返す
-            return new ByteArrayInputStream(this.pack.getSounds().get(location.getResourcePath()));
+            return new ByteArrayInputStream(this.pack.getSounds().get(soundKey));
         }
-        else if (location.getResourcePath().equals("sounds/sounds.json")) {
+        else if (location.getResourcePath().equals("sounds.json")) {
             // sounds.jsonは生成した物を返す
             return new ByteArrayInputStream(this.soundJson.getBytes(StandardCharsets.UTF_8));
         }
@@ -108,13 +112,15 @@ public class GTSMemoryResourcePack implements IResourcePack {
      */
     @Override
     public boolean resourceExists(ResourceLocation location) {
+        String path = location.getResourcePath();
+        String soundKey = path.startsWith("sounds/") ? path.substring(7) : path;
         if (!location.getResourceDomain().equals(this.getPackName().toLowerCase())) {
             return false;
         }
-        if (location.getResourcePath().equals("sounds/sounds.json")) {
+        if (location.getResourcePath().equals("sounds.json")) {
             return true;
         }
-        return this.pack.getSounds().containsKey(location.getResourcePath());
+        return this.pack.getSounds().containsKey(soundKey);
     }
 
     /**
@@ -157,7 +163,7 @@ public class GTSMemoryResourcePack implements IResourcePack {
      */
     @Override
     public String getPackName() {
-        return "gts_" + this.pack.getName();
+        return "gts_" + this.pack.getName().toLowerCase();
     }
 
 }

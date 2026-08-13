@@ -67,6 +67,7 @@ public class GTSClientProxy extends GTSProxy {
      */
     @Override
     public void registerResourcePack(List<GTSPack> packs) {
+        super.registerResourcePack(packs);
         for (GTSPack pack: packs) {
             addDefaultResourcePack(new GTSMemoryResourcePack(pack));
         }

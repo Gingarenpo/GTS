@@ -40,7 +40,9 @@ public class GTSDetectedCycle extends GTSDurationCycle {
 
     @Override
     public boolean tick(GTSTileEntityTrafficController te, boolean detected, World world) {
-        if (this.nowPhase == 0 && !(this.detectEndTick > world.getWorldTime() && world.getWorldTime() >= this.detectStartTick)) {
+        long current = this.getExtendedWorldTime(world, this.detectStartTick, this.detectEndTick);
+        System.out.println(current);
+        if (this.nowPhase == 0 && !(this.detectStartTick <= current && current <= this.detectEndTick)) {
             // 感知時間帯以外の場合でinitialフェーズの場合
             if (this.forceDetectTick < this.tick) {
                 // さらに、現在のサイクル待ちが最低待機時間を超えた場合
@@ -54,7 +56,6 @@ public class GTSDetectedCycle extends GTSDurationCycle {
 
     @Override
     public void onDetect(GTSTileEntityTrafficController te, World world) {
-        System.out.println("呼ばれました");
         if (this.nowPhase == 0 ) {
             GTSPhase phase = this.phases.get(this.nowPhase);
             if (phase instanceof GTSDetectionWaitingPhase) {
