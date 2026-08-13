@@ -121,6 +121,9 @@ public abstract class GTSCycle {
             this.phases.get(this.nowPhase).resetTick();
             this.nowPhase = next;
             this.phases.get(this.nowPhase).resetTick();
+
+            // フェーズの切り替えにより制御機の音響装置動作ロジックを作動させる
+            te.onChangePhase(this.phases.get(this.nowPhase), this);
         }
         else {
             this.end = true;

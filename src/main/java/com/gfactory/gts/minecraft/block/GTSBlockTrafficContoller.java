@@ -8,6 +8,7 @@ import com.gfactory.gts.minecraft.item.GTSItems;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficButton;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficController;
 import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficLight;
+import com.gfactory.gts.minecraft.tileentity.GTSTileEntityTrafficSpeaker;
 import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
@@ -52,11 +53,22 @@ public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficContr
                 if (!worldIn.isRemote) worldIn.notifyBlockUpdate(p, worldIn.getBlockState(p), worldIn.getBlockState(p), 15);
             }
             tet.getAttachedTrafficLights().clear();
+
             for (BlockPos p: tet.getAttachedTrafficButtons()) {
                 // その場所に位置するTileEntityを取得する。バグってnullかもしれないし全然違うものが返ってくる場合もある
                 TileEntity te2 = worldIn.getTileEntity(p);
                 if (!(te2 instanceof GTSTileEntityTrafficButton)) continue; // 無視
                 GTSTileEntityTrafficButton tet2 = (GTSTileEntityTrafficButton) te2;
+                tet2.deattach(tet); // デアタッチ
+                if (!worldIn.isRemote) worldIn.notifyBlockUpdate(p, worldIn.getBlockState(p), worldIn.getBlockState(p), 15);
+            }
+            tet.getAttachedTrafficButtons().clear();
+
+            for (BlockPos p: tet.getAttachedTrafficSpeakers()) {
+                // その場所に位置するTileEntityを取得する。バグってnullかもしれないし全然違うものが返ってくる場合もある
+                TileEntity te2 = worldIn.getTileEntity(p);
+                if (!(te2 instanceof GTSTileEntityTrafficSpeaker)) continue; // 無視
+                GTSTileEntityTrafficSpeaker tet2 = (GTSTileEntityTrafficSpeaker) te2;
                 tet2.deattach(tet); // デアタッチ
                 if (!worldIn.isRemote) worldIn.notifyBlockUpdate(p, worldIn.getBlockState(p), worldIn.getBlockState(p), 15);
             }
@@ -133,6 +145,27 @@ public class GTSBlockTrafficContoller extends GTSBlock<GTSTileEntityTrafficContr
                                 tet.attach((GTSTileEntityTrafficButton) te);
 
                                 ((GTSTileEntityTrafficButton) te).attach(tet);
+                            }
+                            selection.clearSelection();
+                            return true;
+                        }
+                    }
+                    if (te instanceof GTSTileEntityTrafficSpeaker) {
+                        // この押ボタン箱をアタッチするため、ここにあるTileEntityを取得する
+                        // ないとは思うがTileEntityが制御機のものか確認する
+                        TileEntity te2 = worldIn.getTileEntity(pos);
+                        if (te2 instanceof GTSTileEntityTrafficController) {
+                            // もうif文の嵐だが、既にある場合はデタッチ、ない場合はアタッチする
+                            GTSTileEntityTrafficController tet = (GTSTileEntityTrafficController) te2;
+                            if (tet.getAttachedTrafficSpeakers().contains(selection.getSelectedTileEntity())) {
+                                tet.deattach((GTSTileEntityTrafficSpeaker) te);
+                                ((GTSTileEntityTrafficSpeaker) te).deattach(tet);
+                                playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.deattached", pos, selection.getSelectedTileEntity()));
+                            } else {
+                                playerIn.sendMessage(new TextComponentTranslation("gts.message.chat.attached", pos, selection.getSelectedTileEntity()));
+                                tet.attach((GTSTileEntityTrafficSpeaker) te);
+
+                                ((GTSTileEntityTrafficSpeaker) te).attach(tet);
                             }
                             selection.clearSelection();
                             return true;

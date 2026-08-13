@@ -29,6 +29,12 @@ import java.util.List;
  */
 public class GTSClientProxy extends GTSProxy {
 
+    /**
+     * クライアント側でのみ使用する、クライアントサウンドマネージャー
+     * サーバー側で使用するとクラッシュするので注意
+     */
+    public static GTSClientSoundManager CLIENT_SOUND_MANAGER = null;
+
     @Override
     public void preInit(FMLPreInitializationEvent event) {
         super.preInit(event);
@@ -42,7 +48,7 @@ public class GTSClientProxy extends GTSProxy {
         };
 
         // クライアントオーディオマネージャーを登録
-        GTS.CLIENT_SOUND_MANAGER = new GTSClientSoundManager();
+        CLIENT_SOUND_MANAGER = new GTSClientSoundManager();
 
 
     }

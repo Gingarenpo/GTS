@@ -3,7 +3,9 @@ package com.gfactory.gts.minecraft.tileentity;
 import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
+import com.gfactory.gts.minecraft.proxy.GTSClientProxy;
 import com.gfactory.gts.pack.GTSPack;
+import com.gfactory.gts.pack.config.GTSTrafficLightConfig;
 import com.gfactory.gts.pack.config.GTSTrafficSpeakerConfig;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.network.NetworkManager;
@@ -22,6 +24,11 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
      */
     private String playingSoundKey;
 
+    /**
+     * このスピーカーのチャンネル。
+     */
+    private String channel;
+
     public GTSTileEntityTrafficSpeaker() {
         this.setDummy();
 
@@ -35,14 +42,36 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
         return this.playingSoundKey != null;
     }
 
-    public void playSound(String sound) {
-        this.playingSoundKey = sound;
+    public void playSound(GTSTrafficLightConfig.GTSTrafficLightPattern pattern) {
+        // objects野中で最初に見つかったものを流す
+        for (String obj: pattern.getObjects()) {
+            if (this.getConfig().getSounds().containsKey(obj)) {
+                this.playingSoundKey = obj;
+                this.markDirty();
+                if (!world.isRemote) {
+                    world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+                }
+                break;
+            }
+        }
         this.markDirty();
+
     }
 
     public void stopSound() {
         this.playingSoundKey = null;
         this.markDirty();
+        if (!world.isRemote) {
+            world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
+        }
+    }
+
+    public String getChannel() {
+        return channel;
+    }
+
+    public void setChannel(String channel) {
+        this.channel = channel;
     }
 
     @Override
@@ -63,7 +92,7 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
         GTSTrafficSpeakerConfig config = new GTSTrafficSpeakerConfig();
         config.setDummy();
         this.setConfig(config);
-        this.playingSoundKey = "green";
+        this.channel = "test";
     }
 
     @Override
@@ -127,7 +156,7 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
 
         // クライアント側の場合、パケットを受け取った瞬間にクライアントマネージャーを更新する
         if (world.isRemote) {
-            GTS.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, this.getConfig().getSounds().get(this.playingSoundKey));
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, this.getConfig().getSounds().get(this.playingSoundKey));
         }
     }
 
@@ -141,7 +170,15 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
         super.invalidate();
 
         if (world != null && world.isRemote) {
-            GTS.CLIENT_SOUND_MANAGER.updateState(pos, null, null);
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(pos, null, null);
+        }
+    }
+
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (this.world != null && this.world.isRemote) {
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, this.getConfig().getSounds().get(this.playingSoundKey));
         }
     }
 

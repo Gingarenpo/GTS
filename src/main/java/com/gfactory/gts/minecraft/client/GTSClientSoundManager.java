@@ -47,11 +47,12 @@ public class GTSClientSoundManager {
                 // そんなサウンドイベントは存在しないか既に流れているものと同じなので処理しない
                 return;
             }
+            if (nowSound != null) Minecraft.getMinecraft().getSoundHandler().stopSound(nowSound);
             // 新しいサウンドイベントを作成
             PositionedSoundRecord sound = new PositionedSoundRecord(
                     event.getSoundName(),
                     SoundCategory.BLOCKS,
-                    2.0F, // 音量
+                    1.0F, // 音量
                     1.0F, // ピッチ
                     true, // リピート
                     0, // リピートする場合の遅延？
@@ -75,5 +76,12 @@ public class GTSClientSoundManager {
         if (sound != null) {
             Minecraft.getMinecraft().getSoundHandler().stopSound(sound);
         }
+    }
+
+    /**
+     * ワールドからログアウトするときなどにクライアントのサウンド状態をリセットする。
+     */
+    public void clear() {
+        SOUNDS.clear();
     }
 }

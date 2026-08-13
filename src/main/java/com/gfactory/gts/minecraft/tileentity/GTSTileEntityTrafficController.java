@@ -3,6 +3,7 @@ package com.gfactory.gts.minecraft.tileentity;
 import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.common.controller.cycle.GTSCycle;
 import com.gfactory.gts.common.controller.cycle.GTSFixCycle;
+import com.gfactory.gts.common.controller.phase.GTSPhase;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.pack.GTSPack;
@@ -11,11 +12,13 @@ import com.gfactory.gts.pack.config.GTSTrafficLightConfig;
 import com.google.common.reflect.TypeToken;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.nbt.NBTTagList;
+import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
 import net.minecraft.util.math.BlockPos;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Map;
 
 /**
  * 交通信号制御機に関するデータを保持するTileEntity。
@@ -47,9 +50,14 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
     private ArrayList<BlockPos> attachedTrafficLights = new ArrayList<>();
 
     /**
-     * この制御機がアタッチされている交通信号制御機の一覧。
+     * この制御機がアタッチされている押ボタン箱の一覧。
      */
     private ArrayList<BlockPos> attachedTrafficButtons = new ArrayList<>();
+
+    /**
+     * この制御機がアタッチされているスピーカーの一覧。
+     */
+    private ArrayList<BlockPos> attachedTrafficSpeakers = new ArrayList<>();
 
 
     public GTSTileEntityTrafficController() {
@@ -119,6 +127,13 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
         }
         this.attachedTrafficButtons = pos;
 
+        pos = new ArrayList<>();
+        for (int i = 0; i < compound.getTagList("gts_attached_traffic_speaker", 10).tagCount(); i++) {
+            NBTTagCompound tag =compound.getTagList("gts_attached_traffic_speaker", 10).getCompoundTagAt(i);
+            pos.add(new BlockPos(tag.getInteger("x"), tag.getInteger("y"), tag.getInteger("z")));
+        }
+        this.attachedTrafficSpeakers = pos;
+
         // CyclesはJSONでシリアライズ等を行う
         // ちょっと回りくどいやり方しているけどこうするしかない
         if (compound.hasKey("gts_cycles")) {
@@ -145,6 +160,7 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
             list.appendTag(c);
         }
         compound.setTag("gts_attached_traffic_light", list);
+
         list = new NBTTagList();
         for (BlockPos pos: this.attachedTrafficButtons) {
             NBTTagCompound c = new NBTTagCompound();
@@ -154,6 +170,16 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
             list.appendTag(c);
         }
         compound.setTag("gts_attached_traffic_button", list);
+
+        list = new NBTTagList();
+        for (BlockPos pos: this.attachedTrafficSpeakers) {
+            NBTTagCompound c = new NBTTagCompound();
+            c.setInteger("x", pos.getX());
+            c.setInteger("y", pos.getY());
+            c.setInteger("z", pos.getZ());
+            list.appendTag(c);
+        }
+        compound.setTag("gts_attached_traffic_speaker", list);
 
         // Cyclesはそれを全てJSONにして
         Type listType = new TypeToken<ArrayList<GTSCycle>>() {}.getType();
@@ -179,6 +205,7 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
                     this.detected = false; // 検知信号無視
                     this.sendDetected(); // 押ボタンに終了を通知
                     this.markDirty();
+                    this.onChangePhase(this.cycles.get(this.nowCycle).getNowPhase(), this.cycles.get(this.nowCycle));
                     return;
                 }
             }
@@ -252,6 +279,11 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
                 ((GTSTileEntityTrafficButton) te).setDetected(this.detected);
             }
         }
+        else if (te instanceof GTSTileEntityTrafficSpeaker) {
+            if (!this.attachedTrafficSpeakers.contains(te.getPos())) {
+                this.attachedTrafficSpeakers.add(te.getPos());
+            }
+        }
         this.markDirty();
         if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficController.class));
         if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
@@ -265,6 +297,9 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
         else if (te instanceof GTSTileEntityTrafficButton) {
             this.attachedTrafficButtons.remove(te.getPos()); // ない場合は何もしないようなので安心して消せる
         }
+        else if (te instanceof GTSTileEntityTrafficSpeaker) {
+            this.attachedTrafficSpeakers.remove(te.getPos());
+        }
         this.markDirty();
         if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficController.class));
         if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
@@ -274,6 +309,7 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
     public void reset() {
         this.attachedTrafficLights = new ArrayList<>();
         this.attachedTrafficButtons = new ArrayList<>();
+        this.attachedTrafficSpeakers = new ArrayList<>();
         if (world.isRemote) GTS.NETWORK.sendToServer(new GTSPacketTileEntity<>(this.writeToNBT(new NBTTagCompound()), this.pos, GTSTileEntityTrafficController.class));
         if (!world.isRemote) world.notifyBlockUpdate(pos, world.getBlockState(pos), world.getBlockState(pos), 3);
     }
@@ -294,6 +330,14 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
         this.attachedTrafficButtons = attachedTrafficButtons;
     }
 
+    public ArrayList<BlockPos> getAttachedTrafficSpeakers() {
+        return attachedTrafficSpeakers;
+    }
+
+    public void setAttachedTrafficSpeakers(ArrayList<BlockPos> attachedTrafficSpeakers) {
+        this.attachedTrafficSpeakers = attachedTrafficSpeakers;
+    }
+
     @Override
     public String toString() {
         return "GTSTileEntityTrafficController{" +
@@ -305,5 +349,40 @@ public class GTSTileEntityTrafficController extends GTSTileEntity<GTSTrafficCont
                 ", cycles=" + cycles +
                 ", attachedTrafficLights=" + attachedTrafficLights +
                 "} " + super.toString();
+    }
+
+    /**
+     * サイクルがフェーズを切り替えた場合、あるいはサイクルの最初のフェーズに切り替わった直後に呼び出される。
+     * 音響装置の鳴動判定等を行う。
+     * @param phase 現在のフェーズ
+     * @param cycle 現在のサイクル
+     */
+    public void onChangePhase(GTSPhase phase, GTSCycle cycle) {
+        if (this.world == null) return;
+        Map<String, GTSTrafficLightConfig.GTSTrafficLightPattern> channels = phase.getChannels();
+        boolean flag = false;
+        for (BlockPos speakerPos: this.attachedTrafficSpeakers) {
+            // 各スピーカーに対してこのキーを鳴らすように仕向ける
+            TileEntity te = this.world.getTileEntity(speakerPos);
+            if (!(te instanceof GTSTileEntityTrafficSpeaker)) continue;
+            GTSTileEntityTrafficSpeaker gte = (GTSTileEntityTrafficSpeaker) te;
+            if (!channels.containsKey(gte.getChannel())) {
+                gte.stopSound();
+                continue;
+            }
+            gte.playSound(channels.get(gte.getChannel()));
+
+        }
+
+    }
+
+    /**
+     * チャンクロード時、音響の残処理を行う
+     */
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        if (this.cycles == null) return;
+        this.onChangePhase(this.cycles.get(this.nowCycle).getNowPhase(), this.cycles.get(this.nowCycle));
     }
 }
