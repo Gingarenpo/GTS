@@ -18,7 +18,7 @@ public class GTSTrafficSpeakerConfig extends GTSConfig<GTSConfig.GTSTexture> {
     @Override
     public void setDummy() {
         this.id = GTSPack.DUMMY_TRAFFIC_SPEAKER;
-        this.size = 1;
+        this.size = 0.25f;
         GTSTexture texture = new GTSTexture();
         texture.base = GTSPack.DUMMY_TRAFFIC_CONTROLLER;
         this.textures = texture;
