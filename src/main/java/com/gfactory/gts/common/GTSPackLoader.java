@@ -2,6 +2,8 @@ package com.gfactory.gts.common;
 
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.GTSPack;
+import net.minecraft.command.ICommandSender;
+import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraftforge.fml.common.ProgressManager;
 
 import java.io.File;
@@ -18,6 +20,12 @@ import java.util.zip.ZipInputStream;
  * <p>GTS1.0ではローダーインスタンスが全てのパックの中身を保持していたが、重複するモデルも全てカウントしてしまう。
  * そのため、メモリ不足に陥ることが多かった。したがって、ここではパックのインスタンスのみを保持する。</p>
  * <p>その都合上、パックを跨いだモデルの使用は原則できない。</p>
+ *
+ * <hr>
+ *
+ * <p>モデルパックをゲーム中に再読み込みすることができるようにalpha6で少し改良。ゲーム内でインスタンスを置き換えるのはかなりデンジャラスなので、
+ * 最悪ダミーに置き換わってしまわないように一度ローダーインスタンスをもう一度作ってから素のインスタンスと入れ替える形で使用する。</p>
+ * <p>NBTタグに関してはパックの名称で判断しているのでこちらもそのように対処。念のため、パックの同一性判定も修正。</p>
  *
  * @author Gingarenpo
  *
@@ -37,9 +45,42 @@ public class GTSPackLoader {
     }
 
     /**
+     * 指定したロケーションからZipファイルを見つけて返す。
+     * @param location 探すもととなるパス
+     * @return 中で見つかったファイル一覧。そもそもない場合はnullがかえることがある
+     */
+    private File[] findZip(File location) {
+        return location.listFiles((dir, name) -> name.endsWith(".zip"));
+    }
+
+    /**
+     * 該当するパスに存在するZipファイルの読み込みを試みる。余り設計としては好ましくないが、このメソッドはパックの読み取り結果によって以下の状態になる。
+     * <ul>
+     *     <li>パックの読み込みに成功した場合: true</li>
+     *     <li>パックとしての読み込みには成功したものの、不正なファイルだらけでパックとして認識されない場合: false</li>
+     *     <li>そもそもZipファイルですらない、中身が壊れているなどして読み込みができなかった場合: IOExceptionをスロー</li>
+     * </ul>
+     *
+     * @param f 読み込もうとするZipファイル
+     * @return 上記説明を参照
+     * @throws IOException 上記説明を参照
+     */
+    private boolean loadZip(File f) throws IOException {
+        try (FileInputStream fis = new FileInputStream(f)) {
+            try (ZipInputStream zis = new ZipInputStream(fis)) {
+                GTSPack pack = this.load(zis, f);
+                GTS.LOGGER.debug(pack.toString());
+                if (pack.empty()) return false;
+                this.packs.add(pack);
+                return true;
+            }
+        }
+    }
+
+    /**
      * 指定されたパス内にあるZIPファイルを読み込み、それがGTSで使用可能なパックであれば
      * 中身を読み取ろうとする。読み取りに成功した場合はこのインスタンスに登録され、アクセスできる。
-     * このメソッドは、Preinitで呼び出されることを想定している。
+     * reloadを有効にすると、ゲーム内でのリロードになる。プログレスバーや同一性判定などが追加される。
      *
      * @param file 検索を行うパスを入力。nullも入るが、nullの場合は検索せずに終了するため意味がない。
      */
@@ -48,8 +89,8 @@ public class GTSPackLoader {
 
         GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.start", file.getAbsolutePath()));
 
-        // 1-1. 配下にあるZIPファイルを検索。ZIPファイルは拡張子のみで一旦識別を行う。
-        File[] files = file.listFiles((dir, name) -> name.endsWith(".zip"));
+        // Zipファイルの検索
+        File[] files = this.findZip(file);
         if (files == null) {
             // そもそも見つからん
             GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.notfound"));
@@ -57,24 +98,17 @@ public class GTSPackLoader {
         }
         GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.zip_count", files.length));
 
-        // 1-2. アドオン読み込み用のプログレスバーを取得する。
+        // アドオン追加用プログレスバーの読み込み
         ProgressManager.ProgressBar bar = ProgressManager.push("GTS Pack Search", files.length);
 
-        // 2. ZIPファイルを読み込んでパックを抽出していく
+        // 各Zipファイルのロード
         for (File f: files) {
             bar.step(f.getName());
             // 2-1. Zipファイルとして読み込んでみる
-            try (FileInputStream fis = new FileInputStream(f)) {
-                try (ZipInputStream zis = new ZipInputStream(fis)) {
-                    // 2-2. ZIPファイルの中身を読み込んで、それをPackに格納する
-                    GTSPack pack = this.load(zis, f);
-                    GTS.LOGGER.debug(pack.toString());
-                    if (pack.empty()) {
-                        // 不正がありそうなファイルの場合はクラッシュを避けるため読み込みを避ける
-                        GTS.LOGGER.warn(GTSI18n.i18n("gts.message.pack_search.error.empty", f.getName()));
-                        continue;
-                    }
-                    this.packs.add(pack);
+            try  {
+                if (!this.loadZip(f)) {
+                    // 読み込みに失敗した場合
+                    GTS.LOGGER.warn(GTSI18n.i18n("gts.message.pack_search.error.empty", f.getName()));
                 }
             } catch (IOException e) {
                 // 2-X: ZIPファイルとして不正なもの、壊れているものである場合、その旨をログに出力して続行
@@ -82,12 +116,58 @@ public class GTSPackLoader {
             }
         }
 
-        // 3. オーディオ登録
+        // オーディオ登録
         GTS.proxy.registerResourcePack(this.packs);
 
-        // 4. 後始末とかは任せたぞ
+        // 後始末とかは任せたぞ
         ProgressManager.pop(bar);
         GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.finish", this.packs.size()));
+    }
+
+    /**
+     * インスタンスが新たに作成されていることを前提として、現在のインスタンスにおいてパックの「リロード」を行う。
+     * リロード時と初回読み込み時の違いとしては、進捗状況（Infoに相当）をsenderのチャット欄に表示するというもの。
+     * ICommandSenderはコマンドを送信できるインターフェースとして用いられるため、プレイヤーを入れてもいい。
+     * なお、サーバーとクライアントで少し違うことも考慮して一応isremoteの結果も渡すようにする。
+     *
+     * @param file 検索を開始する対象となるパス
+     * @param sender 実行者。クライアントが実行した場合はプレイヤー、サーバーが実行した場合はサーバーのチャット。
+     * @param isRemote world.isRemote参照。
+     */
+    public void reloadPacks(File file, ICommandSender sender, boolean isRemote) {
+        if (file == null) return; // 壊れているので無視
+
+        GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.start", file.getAbsolutePath()));
+        sender.sendMessage(new TextComponentTranslation("gts.message.pack_search.start", file.getAbsolutePath()));
+
+        // Zipファイルの検索
+        File[] files = this.findZip(file);
+        if (files == null) {
+            // そもそも見つからん
+            GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.notfound"));
+            return;
+        }
+        GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.zip_count", files.length));
+
+        // 各Zipファイルのロード
+        for (File f: files) {
+            // 2-1. Zipファイルとして読み込んでみる
+            try  {
+                if (!this.loadZip(f)) {
+                    // 読み込みに失敗した場合
+                    GTS.LOGGER.warn(GTSI18n.i18n("gts.message.pack_search.error.empty", f.getName()));
+                }
+            } catch (IOException e) {
+                // 2-X: ZIPファイルとして不正なもの、壊れているものである場合、その旨をログに出力して続行
+                GTS.LOGGER.error(GTSI18n.i18n("gts.message.pack_search.error.zip", f.getName()));
+            }
+        }
+
+        // オーディオの登録……はリロード先で行う（落ちる）
+
+        // 後始末とかは任せたぞ
+        GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.finish", this.packs.size()));
+        sender.sendMessage(new TextComponentTranslation("gts.message.pack_search.finish", this.packs.size()));
     }
 
     /**

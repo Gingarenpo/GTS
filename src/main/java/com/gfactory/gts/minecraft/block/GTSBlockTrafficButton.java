@@ -11,10 +11,7 @@ import net.minecraft.block.state.IBlockState;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntity;
-import net.minecraft.util.EnumFacing;
-import net.minecraft.util.EnumHand;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.util.*;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.text.TextComponentTranslation;
 import net.minecraft.world.World;
@@ -79,8 +76,8 @@ public class GTSBlockTrafficButton extends GTSBlock<GTSTileEntityTrafficButton>{
             self.setDetected(true);
 
             // 音鳴らす
-            SoundEvent event = self.getPack().getSoundEvents().get(self.getConfig().getAudios().getDetected());
-            if (event != null && !worldIn.isRemote) worldIn.playSound(null, pos.getX(), pos.getY(), pos.getZ(), event, SoundCategory.BLOCKS, 1.0F, 1.0F);
+            String location = self.getConfig().getAudios().getDetected();
+            if (location != null && worldIn.isRemote) self.playSound(location);
         }
 
         return true;

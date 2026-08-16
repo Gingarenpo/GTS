@@ -54,8 +54,11 @@ public class GTSPack {
      */
     private final HashMap<String, byte[]> sounds = new HashMap<>();
 
+    private final HashMap<String, ResourceLocation> soundLocations = new HashMap<>();
+
     /**
-     * サウンドデータをもとに登録したサウンドイベントの一覧
+     * サウンドデータをもとに登録したサウンドイベントの一覧（動的リソース読み込みに伴い廃止）
+     * @deprecated 動的リソース読み込みにより廃止
      */
     private final HashMap<String, SoundEvent> soundEvents = new HashMap<>();
 
@@ -369,7 +372,7 @@ public class GTSPack {
 
         } catch (IOException e) {
             // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
-            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+            throw new RuntimeException("[ERROR] Cannot load dummy sound on GTS!");
         }
 
         try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/sounds/traffic_speaker_dummy.ogg")) {
@@ -385,7 +388,7 @@ public class GTSPack {
 
         } catch (IOException e) {
             // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
-            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+            throw new RuntimeException("[ERROR] Cannot load dummy sound on GTS!");
         }
 
         try (InputStream is = GTS.class.getResourceAsStream("/assets/gts/sounds/traffic_speaker_flush.ogg")) {
@@ -401,7 +404,7 @@ public class GTSPack {
 
         } catch (IOException e) {
             // ダミーファイルが読み込めない場合は落とす（この先壊れるから）
-            throw new RuntimeException("[ERROR] Cannot load dummy model on GTS!");
+            throw new RuntimeException("[ERROR] Cannot load dummy sound on GTS!");
         }
 
         GTS.LOGGER.info(GTSI18n.i18n("gts.message.pack_search.dummy"));
@@ -551,6 +554,10 @@ public class GTSPack {
         return m;
     }
 
+    /**
+     * @deprecated サウンドイベントの使用はalpha6以降動的なリソース対応のために廃止し、ClientAudioに依存するように変更
+     * @return サウンドイベントを返す
+     */
     public HashMap<String, SoundEvent> getSoundEvents() {
         return soundEvents;
     }
@@ -567,5 +574,42 @@ public class GTSPack {
         if (!this.configs.containsValue(config)) return false;
         // モデルがそもそも存在しない場合は検証失敗
         return this.models.containsKey(config.getModel());
+    }
+
+    /**
+     * このパックが別のインスタンスと同一のものであるかどうかを判定する。
+     * 現時点では、名称が等しいものは同一のインスタンスであるという判定をしている。（中身の変更までは考慮していない）
+     * @param obj 比較対象のパック
+     * @return 同一のパックである場合にtrue
+     */
+    @Override
+    public boolean equals(Object obj) {
+        if (!(obj instanceof GTSPack)) return false;
+        GTSPack other = (GTSPack) obj;
+        return other.getName() != null && other.getName().equals(this.name);
+    }
+
+    /**
+     * このパックが「中身まで」含めて全て一致しているかどうかを判定する。
+     * 読み込まれている各データの数、中身がすべて一致していて初めてtrueを返す。
+     * 現状仕様ケースが見当たらないが、同一性の確保を兼ねて記載。
+     * @param obj 対象となるオブジェクト
+     * @return 読み込まれたデータを含めて全てのデータが一致した場合はtrue
+     */
+    public boolean deepEquals(Object obj) {
+        if (!(obj instanceof GTSPack)) return false;
+        GTSPack other = (GTSPack) obj;
+
+        // 各データを確認
+        return this.models.equals(other.models)
+                && this.resizedModels.equals(other.resizedModels)
+                && this.soundEvents.equals(other.soundEvents)
+                && this.textures.equals(other.textures)
+                && this.sounds.equals(other.sounds)
+                && this.equals(other);
+    }
+
+    public HashMap<String, ResourceLocation> getSoundLocations() {
+        return soundLocations;
     }
 }

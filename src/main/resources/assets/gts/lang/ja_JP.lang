@@ -21,6 +21,12 @@ gts.message.chat.deselected=%1$sの選択を解除しました
 gts.message.chat.attached=%2$sに%1$sをアタッチしました
 gts.message.chat.deattached=%2$sから%1$sをアタッチ解除しました
 gts.message.chat.selection_override=警告: 以前の選択内容は上書きされます！
+gts.message.chat.reload_missing_pack=警告: パックをリロードしましたが、「%1$s」が見つかりませんでした。このパックを使用している場合、ダミーに置き換わる可能性があります。続行しますか？
+gts.message.chat.reload_missing_pack_title=パックの不足を検出
+gts.message.chat.reload_busy=パックのリロード中にさらにリロードすることはできません！
+gts.message.chat.reload_complete=パックのリロードは完了しました。読み込めたパック: %1$s
+gts.message.chat.reload_cancel=パックのリロードはキャンセルされました。
+gts.message.chat.reload_confirm_hint=/gts confirmを入力すると承認、/gts cancelを入力するとリロードをキャンセルします。
 
 gts.exception.argument=一つ以上のパラメーターがNULLになっています。
 gts.exception.pack_load.io=「%1$s」を読み込めませんでした。理由: &2$s
@@ -42,6 +48,10 @@ tile.traffic_speaker.name=スピーカー
 itemGroup.gts_tab=GTS - Ginren Traffic System
 item.gts.attachment.name=GTSアタッチメント
 item.gts.traffic_arm.name=アーム
+
+# クライアント専用：キーバインド関連
+key.categories.gts=GTS - Ginren Traffic System
+key.gts.reload=パックのリロード
 
 gts.gui.model_search=モデルパックを検索
 gts.gui.model_choose=モデルを確定

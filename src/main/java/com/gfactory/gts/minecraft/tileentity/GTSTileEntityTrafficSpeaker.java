@@ -156,7 +156,7 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
 
         // クライアント側の場合、パケットを受け取った瞬間にクライアントマネージャーを更新する
         if (world.isRemote) {
-            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, this.getConfig().getSounds().get(this.playingSoundKey));
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, this.pack.getSoundLocations().get(this.getConfig().getSounds().get(this.playingSoundKey)), true);
         }
     }
 
@@ -170,7 +170,7 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
         super.invalidate();
 
         if (world != null && world.isRemote) {
-            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(pos, null, null);
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(pos, null, null, false);
         }
     }
 
@@ -178,7 +178,7 @@ public class GTSTileEntityTrafficSpeaker extends GTSTileEntity<GTSTrafficSpeaker
     public void onLoad() {
         super.onLoad();
         if (this.world != null && this.world.isRemote) {
-            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, this.getConfig().getSounds().get(this.playingSoundKey));
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, this.pack.getSoundLocations().get(this.getConfig().getSounds().get(this.playingSoundKey)), true);
         }
     }
 

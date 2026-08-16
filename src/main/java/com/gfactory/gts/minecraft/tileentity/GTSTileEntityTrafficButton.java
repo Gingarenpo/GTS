@@ -2,13 +2,13 @@ package com.gfactory.gts.minecraft.tileentity;
 
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
+import com.gfactory.gts.minecraft.proxy.GTSClientProxy;
 import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSTrafficButtonConfig;
 import net.minecraft.nbt.NBTTagCompound;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.ITickable;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.math.BlockPos;
 
 /**
@@ -181,8 +181,8 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
 
         // 常時鳴らす音の判定で、鳴らす
         if (this.world.isRemote && this.getConfig() != null && this.getConfig().getBaseSoundTick() != 0 && world.getTotalWorldTime() % this.getConfig().getBaseSoundTick() == 0) {
-            SoundEvent event = this.getPack().getSoundEvents().get(this.getConfig().getAudios().getDetected());
-            this.world.playSound(null, this.posX, this.posY, this.posZ, event, SoundCategory.BLOCKS, 1.0f, 1.0f);
+            ResourceLocation location = this.getPack().getSoundLocations().get(this.getConfig().getAudios().getBase());
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, location, false);
         }
     }
 
@@ -204,5 +204,11 @@ public class GTSTileEntityTrafficButton extends GTSTileEntity<GTSTrafficButtonCo
         // 制御機のTileEntity更新
         controller.markDirty();
         this.world.notifyBlockUpdate(this.pos, this.world.getBlockState(this.pos), this.world.getBlockState(this.pos), 3);
+    }
+
+    public void playSound(String location) {
+        if (this.world != null && this.world.isRemote) {
+            GTSClientProxy.CLIENT_SOUND_MANAGER.updateState(this.pos, this.pack, GTS.getMemoryResourcePackResourceLocation(this.pack, location.replace(".ogg", "")), false);
+        }
     }
 }

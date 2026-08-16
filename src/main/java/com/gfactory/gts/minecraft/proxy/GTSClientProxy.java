@@ -3,6 +3,8 @@ package com.gfactory.gts.minecraft.proxy;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.minecraft.block.GTSBlocks;
 import com.gfactory.gts.minecraft.client.GTSClientSoundManager;
+import com.gfactory.gts.minecraft.client.GTSKeyBindings;
+import com.gfactory.gts.minecraft.client.GTSKeyInputHandler;
 import com.gfactory.gts.minecraft.renderer.*;
 import com.gfactory.gts.minecraft.tileentity.*;
 import com.gfactory.gts.pack.GTSMemoryResourcePack;
@@ -14,6 +16,7 @@ import net.minecraft.creativetab.CreativeTabs;
 import net.minecraft.item.Item;
 import net.minecraft.item.ItemStack;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fml.client.registry.ClientRegistry;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
@@ -64,6 +67,10 @@ public class GTSClientProxy extends GTSProxy {
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficSign.class, new GTSTileEntityTrafficSignRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficButton.class, new GTSTileEntityTrafficButtonRenderer());
         ClientRegistry.bindTileEntitySpecialRenderer(GTSTileEntityTrafficSpeaker.class, new GTSTileEntityTrafficSpeakerRenderer());
+
+        // キーバインドの登録
+        GTSKeyBindings.init();
+        MinecraftForge.EVENT_BUS.register(new GTSKeyInputHandler());
     }
 
     @Override

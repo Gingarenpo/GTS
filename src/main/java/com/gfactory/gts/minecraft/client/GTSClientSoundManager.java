@@ -4,8 +4,8 @@ import com.gfactory.gts.pack.GTSPack;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.audio.ISound;
 import net.minecraft.client.audio.PositionedSoundRecord;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.BlockPos;
 import net.minecraftforge.fml.relauncher.Side;
 import net.minecraftforge.fml.relauncher.SideOnly;
@@ -28,11 +28,12 @@ public class GTSClientSoundManager {
      * 入れ込む。path=nullが指定された場合は停止とみなし、再生を終了する。
      * @param pos 座標。TileEntityに紐づく座標を渡す。
      * @param pack 読み込むべき音声が格納されたパック。
-     * @param path 読み込むべき音声のパス。キーではなくパスであることに注意。
+     * @param path 読み込むべき音声のResourceLocation
+     * @param repeat 繰り返すかどうか
      */
-    public void updateState(BlockPos pos, GTSPack pack, String path) {
+    public void updateState(BlockPos pos, GTSPack pack, ResourceLocation path, boolean repeat) {
 
-        System.out.println("pos="+pos+", pack="+pack+", path="+path);
+        // System.out.println(pos + "," + pack + "," + path + "," + repeat);
 
         if (path == null) {
             // 停止の場合
@@ -41,20 +42,23 @@ public class GTSClientSoundManager {
         }
         else {
             // パスがNULLではない場合、通常はその音源の再生を開始する場合である
-            SoundEvent event = pack.getSoundEvents().get(path);
             ISound nowSound = SOUNDS.get(pos);
-            if (event == null || (nowSound != null && event.getSoundName().equals(nowSound.getSoundLocation()))) {
+            if (nowSound != null && !nowSound.canRepeat() && !Minecraft.getMinecraft().getSoundHandler().isSoundPlaying(nowSound)) {
+                SOUNDS.remove(pos);
+                nowSound = null;
+            }
+            if (nowSound != null && path.equals(nowSound.getSoundLocation())) {
                 // そんなサウンドイベントは存在しないか既に流れているものと同じなので処理しない
                 return;
             }
-            if (nowSound != null) Minecraft.getMinecraft().getSoundHandler().stopSound(nowSound);
+            Minecraft.getMinecraft().getSoundHandler().stopSound(nowSound);
             // 新しいサウンドイベントを作成
             PositionedSoundRecord sound = new PositionedSoundRecord(
-                    event.getSoundName(),
+                    path,
                     SoundCategory.BLOCKS,
                     1.0F, // 音量
                     1.0F, // ピッチ
-                    true, // リピート
+                    repeat, // リピート
                     0, // リピートする場合の遅延？
                     ISound.AttenuationType.LINEAR, // 減衰強度
                     pos.getX() + 0.5f,

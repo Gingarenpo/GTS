@@ -5,21 +5,27 @@ import com.gfactory.gts.common.GTSPackLoader;
 import com.gfactory.gts.common.GTSSignTextureManager;
 import com.gfactory.gts.common.controller.cycle.GTSCycle;
 import com.gfactory.gts.common.controller.phase.GTSPhase;
+import com.gfactory.gts.minecraft.command.GTSCommand;
 import com.gfactory.gts.minecraft.proxy.GTSProxy;
+import com.gfactory.gts.pack.GTSPack;
 import com.gfactory.gts.pack.config.GTSConfig;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.RuntimeTypeAdapterFactory;
 import net.minecraft.creativetab.CreativeTabs;
+import net.minecraft.util.ResourceLocation;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.SidedProxy;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
+import net.minecraftforge.fml.common.event.FMLServerStartingEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
 import net.minecraftforge.fml.common.network.simpleimpl.SimpleNetworkWrapper;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+
+import java.io.File;
 
 /**
  * Mod エントリーポイント
@@ -78,6 +84,8 @@ public class GTS {
      */
     public static final SimpleNetworkWrapper NETWORK = NetworkRegistry.INSTANCE.newSimpleChannel(GTS.MODID);
 
+    public static File MOD_DIRECTORY;
+
     @Mod.EventHandler
     public void preInit(FMLPreInitializationEvent event) throws InterruptedException {
         // GTSCycleクラスをスキャンして登録する
@@ -124,4 +132,18 @@ public class GTS {
         proxy.postInit(event);
     }
 
+    @Mod.EventHandler
+    public void serverStarting(FMLServerStartingEvent event) {
+        event.registerServerCommand(new GTSCommand());
+    }
+
+    /**
+     * サウンドパック等で用いるためのデフォルトリソースロケーションを返す。
+     * @param pack パック
+     * @param name キー
+     * @return gts_PACKNAME:name(小文字) みたいな感じで返る
+     */
+    public static ResourceLocation getMemoryResourcePackResourceLocation(GTSPack pack, String name) {
+        return new ResourceLocation(GTS.MODID + "_" + pack.getName(), name.toLowerCase());
+    }
 }

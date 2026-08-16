@@ -10,12 +10,10 @@ import com.gfactory.gts.minecraft.network.packet.GTSPacketTileEntity;
 import com.gfactory.gts.minecraft.tileentity.*;
 import com.gfactory.gts.pack.GTSPack;
 import net.minecraft.util.ResourceLocation;
-import net.minecraft.util.SoundEvent;
 import net.minecraftforge.fml.common.event.FMLInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPostInitializationEvent;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.network.NetworkRegistry;
-import net.minecraftforge.fml.common.registry.ForgeRegistries;
 import net.minecraftforge.fml.common.registry.GameRegistry;
 import net.minecraftforge.fml.relauncher.Side;
 
@@ -48,9 +46,10 @@ public class GTSProxy {
         GTSCapabilities.register();
 
         GTS.LOADER = new GTSPackLoader();
-        // config フォルダの親ディレクトリ（= ゲームのルートディレクトリ）を取得
+        // config フォルダの親ディレクトリ（= ゲームのルートディレクトリ）を取得し、登録
         File gameDir = event.getModConfigurationDirectory().getParentFile();
         File gtsDir = new File(gameDir, "mods/GTS");
+        GTS.MOD_DIRECTORY = gtsDir;
 
         // ディレクトリが存在しない場合は自動作成
         if (!gtsDir.exists()) {
@@ -82,16 +81,11 @@ public class GTSProxy {
     public void registerResourcePack(List<GTSPack> packs) {
         // 共通項目となるSoundEventの登録を行う
         for (GTSPack pack: packs) {
-            // 各パックのドメイン名（リソースダミー）を指定
-            String domain = "gts_" + pack.getName().toLowerCase();
             for (String fileName: pack.getSounds().keySet()) {
                 // 各サウンドをSoundEventとして登録する
                 String path = fileName.replace(".ogg", "").toLowerCase();
-                ResourceLocation location = new ResourceLocation(domain, path);
-                SoundEvent event = new SoundEvent(location);
-                event.setRegistryName(location);
-                ForgeRegistries.SOUND_EVENTS.register(event);
-                pack.getSoundEvents().put(fileName, event);
+                ResourceLocation location = GTS.getMemoryResourcePackResourceLocation(pack, path);
+                pack.getSoundLocations().put(fileName, location);
             }
         }
     }
