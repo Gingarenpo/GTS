@@ -3,7 +3,6 @@ package com.gfactory.gts.minecraft.tileentity;
 import com.gfactory.core.helper.GNBTHelper;
 import com.gfactory.core.mqo.MQO;
 import com.gfactory.core.mqo.MQOObject;
-import com.gfactory.core.mqo.MQOVertex;
 import com.gfactory.gts.common.GTSI18n;
 import com.gfactory.gts.minecraft.GTS;
 import com.gfactory.gts.pack.GTSPack;
@@ -274,22 +273,23 @@ public abstract class GTSTileEntity<T extends GTSConfig> extends TileEntity {
 
     /**
      * このTileEntityがレンダリングされるべき領域を返す
-     * TODO: 重い場合は消す
+     * 無限遠で描画できるように返す
      * @return バウンディングボックス
      */
     @Override
     public AxisAlignedBB getRenderBoundingBox() {
-        AxisAlignedBB aabb = super.getRenderBoundingBox();
-        if (this.pack == null || this.config == null) return aabb;
-        MQO model = this.pack.getResizingModels(this.config.getModel(), this.config.getSize());
-        if (model == null) {
-            return aabb;
-        }
-        for (MQOObject o: model.getObjects()) {
-            MQOVertex[] r = o.getBoundingBox();
-            aabb.union(new AxisAlignedBB(r[0].getX(), r[0].getY(), r[0].getZ(), r[1].getX(), r[1].getY(), r[1].getZ()));
-        }
-        return aabb;
+        return TileEntity.INFINITE_EXTENT_AABB;
+//        AxisAlignedBB aabb = super.getRenderBoundingBox();
+//        if (this.pack == null || this.config == null) return aabb;
+//        MQO model = this.pack.getResizingModels(this.config.getModel(), this.config.getSize());
+//        if (model == null) {
+//            return aabb;
+//        }
+//        for (MQOObject o: model.getObjects()) {
+//            MQOVertex[] r = o.getBoundingBox();
+//            aabb = aabb.union(new AxisAlignedBB(r[0].getX(), r[0].getY(), r[0].getZ(), r[1].getX(), r[1].getY(), r[1].getZ()));
+//        }
+//        return aabb;
     }
 
     protected void calcModelMinMax() {

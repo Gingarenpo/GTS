@@ -103,4 +103,14 @@ public abstract class GTSTileEntityRenderer<T extends GTSTileEntity, U extends G
     public boolean hasModel() {
         return true;
     }
+
+    /**
+     * グローバルなレンダリングシステムを使うかどうか。これを用いることにより、画面外でもブロックが描画されるようになる
+     * @param te
+     * @return
+     */
+    @Override
+    public boolean isGlobalRenderer(GTSTileEntity te) {
+        return true;
+    }
 }
