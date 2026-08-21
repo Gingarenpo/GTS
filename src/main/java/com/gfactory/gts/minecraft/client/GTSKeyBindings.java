@@ -14,7 +14,7 @@ public class GTSKeyBindings {
     public static void init() {
         KEY_RELOAD = new KeyBinding(
                 "key.gts.reload",
-                Keyboard.KEY_F8,
+                Keyboard.KEY_F9,
                 "key.categories.gts"
         );
         ClientRegistry.registerKeyBinding(KEY_RELOAD);
